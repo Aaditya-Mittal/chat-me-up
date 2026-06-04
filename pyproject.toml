@@ -1,0 +1,24 @@
+[project]
+name = "chat_with_me"
+version = "0.1.0"
+description = "chat_with_me using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "crewai[tools]==1.14.5a2"
+]
+
+[project.scripts]
+chat_with_me = "chat_with_me.main:run"
+run_crew = "chat_with_me.main:run"
+train = "chat_with_me.main:train"
+replay = "chat_with_me.main:replay"
+test = "chat_with_me.main:test"
+run_with_trigger = "chat_with_me.main:run_with_trigger"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.crewai]
+type = "crew"
