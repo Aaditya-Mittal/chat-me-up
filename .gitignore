@@ -1,4 +1,6 @@
 .env
 __pycache__/
 .DS_Store
-knowledge/
+knowledge/about_me.md
+knowledge/user_preference.txt
+
