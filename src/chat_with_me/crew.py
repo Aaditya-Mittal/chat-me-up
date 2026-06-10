@@ -10,31 +10,20 @@ class ChatWithMe():
     agents: list[BaseAgent]
     tasks: list[Task]
 
-    @agent
-    def researcher(self) -> Agent:
-        return Agent(
-            config=self.agents_config['researcher'], # type: ignore[index]
-            verbose=True
-        )
+    agents_config = 'config/agents.yaml'
+    tasks_config = 'config/tasks.yaml'
 
     @agent
-    def reporting_analyst(self) -> Agent:
+    def persona_agent(self) -> Agent:
         return Agent(
-            config=self.agents_config['reporting_analyst'], # type: ignore[index]
+            config=self.agents_config['persona_agent'], # type: ignore[index]
             verbose=True
         )
 
     @task
-    def research_task(self) -> Task:
+    def respond_task(self) -> Task:
         return Task(
-            config=self.tasks_config['research_task'], # type: ignore[index]
-        )
-
-    @task
-    def reporting_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['reporting_task'], # type: ignore[index]
-            output_file='report.md'
+            config=self.tasks_config['respond_task'], # type: ignore[index]
         )
 
     @crew
