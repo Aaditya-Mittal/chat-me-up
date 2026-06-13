@@ -1,6 +1,7 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
+from crewai.knowledge.source.text_file_knowledge_source import TextFileKnowledgeSource
 
 
 @CrewBase
@@ -10,6 +11,10 @@ class ChatWithMe():
     agents: list[BaseAgent]
     tasks: list[Task]
 
+    text_source = TextFileKnowledgeSource(
+        file_paths=["knowledge/about_me.md","knowledge/resume.md"]
+    )
+
     agents_config = 'config/agents.yaml'
     tasks_config = 'config/tasks.yaml'
 
@@ -17,7 +22,8 @@ class ChatWithMe():
     def persona_agent(self) -> Agent:
         return Agent(
             config=self.agents_config['persona_agent'], # type: ignore[index]
-            verbose=True
+            verbose=True,
+            knowledge_sources=[self.text_source]
         )
 
     @task
@@ -34,4 +40,5 @@ class ChatWithMe():
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
+            memory=True
         )
