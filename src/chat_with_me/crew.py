@@ -12,7 +12,7 @@ class ChatWithMe():
     tasks: list[Task]
 
     text_source = TextFileKnowledgeSource(
-        file_paths=["knowledge/about_me.md","knowledge/resume.md"]
+        file_paths=["about_me.md","resume.md"]
     )
 
     agents_config = 'config/agents.yaml'
