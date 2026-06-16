@@ -1,3 +1,4 @@
+import os
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
@@ -23,7 +24,6 @@ class ChatWithMe():
         return Agent(
             config=self.agents_config['persona_agent'], # type: ignore[index]
             verbose=True,
-            knowledge_sources=[self.text_source]
         )
 
     @task
@@ -40,5 +40,7 @@ class ChatWithMe():
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
-            memory=True
+            memory=False,
+            embedder={"provider":"google-generativeai", "config":{"model_name":"text-embedding-005", "api_key":os.environ.get('GOOGLE_API_KEY')}},
+            knowledge_sources=[self.text_source]
         )
