@@ -41,6 +41,6 @@ class ChatWithMe():
             process=Process.sequential,
             verbose=True,
             memory=True,
-            embedder={"provider":"google-generativeai", "config":{"model_name":"text-embedding-005", "api_key":os.environ.get('GOOGLE_API_KEY')}},
+            embedder={"provider":"google-generativeai", "config":{"model_name":"gemini-embedding-001", "api_key":os.environ.get('GOOGLE_API_KEY')}},
             knowledge_sources=[self.text_source]
         )
