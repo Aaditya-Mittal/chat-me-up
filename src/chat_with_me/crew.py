@@ -40,7 +40,7 @@ class ChatWithMe():
             tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
-            memory=True,
+            memory=False,
             embedder={"provider":"google-generativeai", "config":{"model_name":"gemini-embedding-001", "api_key":os.environ.get('GOOGLE_API_KEY')}},
             knowledge_sources=[self.text_source]
         )
