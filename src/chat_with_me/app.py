@@ -4,7 +4,6 @@ Gradio Chat Interface for the Perona Chat Bot.
 Wraps the CrewAI crew in an interactive chat UI with conversation history.
 """
 
-import os
 import warnings
 
 import gradio as gr
@@ -15,31 +14,33 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 # Initialize the crew once at startup (avoids re-embedding knowledge each call)
-print("🔧 Initializing ChatWithMe crew...")
+print("Initializing ChatWithMe crew...")
 crew_instance = ChatWithMe().crew()
-print("✅ Crew ready!")
+print("Crew ready!")
 
 
-def format_history(history: list[dict]) -> str:
-    """Convert Gradio chat history into a readable string for the agent."""
+def format_history(history: list) -> str:
+    """Convert Gradio chat history (list of tuples) into a readable string."""
     if not history:
         return ""
 
     lines = []
-    for msg in history:
-        role = "Visitor" if msg["role"] == "user" else "Aaditya"
-        lines.append(f"{role}: {msg['content']}")
+    for user_msg, bot_msg in history:
+        if user_msg:
+            lines.append(f"Visitor: {user_msg}")
+        if bot_msg:
+            lines.append(f"Aaditya: {bot_msg}")
 
     return "\n".join(lines)
 
 
-def respond(message: str, history: list[dict]) -> str:
+def respond(message: str, history: list) -> str:
     """
     Handle a chat message by running the CrewAI crew with conversation context.
 
     Args:
         message: The visitor's new message.
-        history: List of previous messages as dicts with 'role' and 'content'.
+        history: List of previous (user, bot) message tuples.
 
     Returns:
         The agent's response string.
@@ -59,17 +60,10 @@ def respond(message: str, history: list[dict]) -> str:
         result = crew_instance.kickoff(inputs={"user_message": full_message})
         return result.raw
     except Exception as e:
-        return f"Sorry, I ran into an issue processing that. Could you try again? (Error: {str(e)[:100]})"
+        return f"Sorry, I ran into an issue. Could you try again? (Error: {str(e)[:100]})"
 
 
 # --- Gradio UI ---
-
-DESCRIPTION = """
-# 💬 Chat with Aaditya Mittal
-
-Ask me anything about my experience, projects, skills, or just say hi!
-I'm an AI representative trained on Aaditya's knowledge base — I'll respond in his voice.
-"""
 
 EXAMPLES = [
     "Tell me about yourself",
@@ -90,27 +84,16 @@ footer { display: none !important; }
 
 demo = gr.ChatInterface(
     fn=respond,
-    type="messages",
     title="Chat with Aaditya",
-    description=DESCRIPTION,
+    description="Ask me anything about my experience, projects, skills, or just say hi! I'm an AI representative trained on Aaditya's knowledge base.",
     examples=EXAMPLES,
     theme=gr.themes.Soft(
         primary_hue="indigo",
         secondary_hue="blue",
         neutral_hue="slate",
-        font=gr.themes.GoogleFont("Inter"),
     ),
     css=CSS,
     cache_examples=False,
-    chatbot=gr.Chatbot(
-        height=500,
-        placeholder="👋 Hey! Ask me anything about Aaditya's work, projects, or experience...",
-        show_copy_button=True,
-    ),
-    textbox=gr.Textbox(
-        placeholder="Type your message here...",
-        scale=7,
-    ),
 )
 
 
