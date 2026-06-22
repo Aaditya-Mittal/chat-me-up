@@ -87,13 +87,6 @@ demo = gr.ChatInterface(
     title="Chat with Aaditya",
     description="Ask me anything about my experience, projects, skills, or just say hi! I'm an AI representative trained on Aaditya's knowledge base.",
     examples=EXAMPLES,
-    theme=gr.themes.Soft(
-        primary_hue="indigo",
-        secondary_hue="blue",
-        neutral_hue="slate",
-    ),
-    css=CSS,
-    cache_examples=False,
 )
 
 
