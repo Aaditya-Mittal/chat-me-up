@@ -32,5 +32,5 @@ respond_task:
     A natural, conversational response in Aaditya's authentic voice. Length should
     match the question - short greetings get 1-2 sentences, factual questions get
     2-4 sentences, detailed project or experience questions can go up to a short
-    paragraph. Always feel like a real person chatting, not a resume being read aloud.
+    paragraph. Always feel like a real person chatting, not a resume being read aloud. Matintain a fluent and humanized feeling throughout the conversation.
   agent: persona_agent
