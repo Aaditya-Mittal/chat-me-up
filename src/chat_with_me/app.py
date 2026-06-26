@@ -75,289 +75,316 @@ theme = gr.themes.Soft(
     primary_hue=gr.themes.colors.indigo,
     secondary_hue=gr.themes.colors.violet,
     neutral_hue=gr.themes.colors.slate,
-    font=("Inter", "system-ui", "sans-serif"),
-    font_mono=("JetBrains Mono", "Fira Code", "monospace"),
+    font=(gr.themes.GoogleFont("Inter"), "system-ui", "-apple-system", "sans-serif"),
+    font_mono=(gr.themes.GoogleFont("JetBrains Mono"), "Fira Code", "monospace"),
 ).set(
-    # Background
-    body_background_fill="#0b0d1a",
-    body_background_fill_dark="#0b0d1a",
-    body_text_color="#e2e8f0",
-    body_text_color_dark="#e2e8f0",
+    body_background_fill="#0a0b14",
+    body_background_fill_dark="#0a0b14",
+    body_text_color="#cbd5e1",
+    body_text_color_dark="#cbd5e1",
 
-    # Containers
-    block_background_fill="rgba(15, 18, 35, 0.85)",
-    block_background_fill_dark="rgba(15, 18, 35, 0.85)",
-    block_border_color="rgba(99, 102, 241, 0.12)",
-    block_border_color_dark="rgba(99, 102, 241, 0.12)",
+    block_background_fill="rgba(15, 17, 30, 0.7)",
+    block_background_fill_dark="rgba(15, 17, 30, 0.7)",
+    block_border_color="rgba(99, 102, 241, 0.08)",
+    block_border_color_dark="rgba(99, 102, 241, 0.08)",
     block_label_text_color="#818cf8",
     block_label_text_color_dark="#818cf8",
-    block_shadow="0 4px 24px rgba(0, 0, 0, 0.4)",
-    block_shadow_dark="0 4px 24px rgba(0, 0, 0, 0.4)",
+    block_shadow="none",
+    block_shadow_dark="none",
 
-    # Buttons
-    button_primary_background_fill="linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-    button_primary_background_fill_dark="linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+    button_primary_background_fill="#6366f1",
+    button_primary_background_fill_dark="#6366f1",
     button_primary_text_color="#ffffff",
     button_primary_text_color_dark="#ffffff",
-    button_primary_background_fill_hover="linear-gradient(135deg, #818cf8 0%, #a78bfa 100%)",
-    button_primary_background_fill_hover_dark="linear-gradient(135deg, #818cf8 0%, #a78bfa 100%)",
-    button_secondary_background_fill="rgba(30, 30, 60, 0.6)",
-    button_secondary_background_fill_dark="rgba(30, 30, 60, 0.6)",
-    button_secondary_text_color="#c7d2fe",
-    button_secondary_text_color_dark="#c7d2fe",
-    button_secondary_border_color="rgba(99, 102, 241, 0.25)",
-    button_secondary_border_color_dark="rgba(99, 102, 241, 0.25)",
+    button_primary_background_fill_hover="#818cf8",
+    button_primary_background_fill_hover_dark="#818cf8",
 
-    # Inputs
-    input_background_fill="rgba(10, 12, 28, 0.9)",
-    input_background_fill_dark="rgba(10, 12, 28, 0.9)",
-    input_border_color="rgba(99, 102, 241, 0.2)",
-    input_border_color_dark="rgba(99, 102, 241, 0.2)",
-    input_border_color_focus="rgba(129, 140, 248, 0.5)",
-    input_border_color_focus_dark="rgba(129, 140, 248, 0.5)",
-    input_placeholder_color="#475569",
-    input_placeholder_color_dark="#475569",
+    input_background_fill="rgba(15, 17, 30, 0.95)",
+    input_background_fill_dark="rgba(15, 17, 30, 0.95)",
+    input_border_color="rgba(99, 102, 241, 0.15)",
+    input_border_color_dark="rgba(99, 102, 241, 0.15)",
+    input_border_color_focus="rgba(99, 102, 241, 0.4)",
+    input_border_color_focus_dark="rgba(99, 102, 241, 0.4)",
+    input_placeholder_color="#3f4565",
+    input_placeholder_color_dark="#3f4565",
 )
 
 
 # --- CSS ---
 
 CSS = """
-/* Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-/* Animated gradient background */
+/* ─── Reset & Base ─── */
+* { transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.3s ease, opacity 0.3s ease; }
+
 .gradio-container {
-    max-width: 880px !important;
-    margin: auto !important;
-    background: linear-gradient(135deg, #0b0d1a 0%, #111336 50%, #0b0d1a 100%) !important;
-    min-height: 100vh;
+    max-width: 820px !important;
+    margin: 0 auto !important;
+    background: #0a0b14 !important;
+    padding: 0 1rem !important;
 }
 
-/* Hide footer */
 footer { display: none !important; }
 
-/* ── Header ── */
-#hero-section {
+/* ─── Hero Header ─── */
+.hero {
     text-align: center;
-    padding: 2rem 1rem 1rem;
-    position: relative;
+    padding: 2.5rem 0 1.5rem;
+    animation: fadeInDown 0.6s ease-out;
 }
 
-#hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 50%;
-    transform: translateX(-50%);
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.hero-avatar {
-    width: 72px; height: 72px;
+.hero-avatar-ring {
+    width: 78px; height: 78px;
     border-radius: 50%;
-    border: 2px solid rgba(129, 140, 248, 0.4);
-    margin: 0 auto 0.75rem;
+    padding: 3px;
+    background: linear-gradient(135deg, #6366f1, #a78bfa, #6366f1);
+    background-size: 200% 200%;
+    animation: ringShift 4s ease infinite;
+    margin: 0 auto 1rem;
     display: block;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
 }
 
-.hero-title {
-    background: linear-gradient(135deg, #c7d2fe 0%, #a78bfa 50%, #818cf8 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-size: 1.85rem;
+@keyframes ringShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.hero-avatar-ring img {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    border: 3px solid #0a0b14;
+    display: block;
+}
+
+.hero h1 {
+    font-size: 1.75rem;
     font-weight: 700;
-    margin: 0 0 0.3rem;
-    letter-spacing: -0.02em;
+    color: #e2e8f0;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.03em;
 }
 
-.hero-subtitle {
-    color: #64748b;
-    font-size: 0.9rem;
-    margin: 0 0 0.2rem;
+.hero p {
+    color: #475569;
+    font-size: 0.88rem;
+    margin: 0;
     font-weight: 400;
+    line-height: 1.6;
 }
 
-.hero-status {
+.status-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: #22c55e;
-    font-size: 0.78rem;
+    margin-top: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.15);
+    font-size: 0.72rem;
+    color: #4ade80;
     font-weight: 500;
-    margin-top: 0.5rem;
+    letter-spacing: 0.03em;
 }
 
-.hero-status .pulse {
-    width: 8px; height: 8px;
-    background: #22c55e;
+.status-dot {
+    width: 6px; height: 6px;
     border-radius: 50%;
-    animation: pulse-glow 2s ease-in-out infinite;
+    background: #4ade80;
+    animation: softPulse 2.5s ease-in-out infinite;
 }
 
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-    50% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+@keyframes softPulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.3); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(74, 222, 128, 0); }
 }
 
-/* ── Chat messages ── */
-.chat-area .message-wrap {
-    padding: 0.5rem 0 !important;
+/* ─── Chatbot ─── */
+.chat-wrap {
+    animation: fadeIn 0.5s ease-out 0.2s both;
 }
 
-.chat-area .bot .message-content {
-    background: rgba(20, 22, 45, 0.9) !important;
-    border: 1px solid rgba(99, 102, 241, 0.1) !important;
-    border-radius: 18px 18px 18px 4px !important;
-    color: #e2e8f0 !important;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-.chat-area .user .message-content {
-    background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%) !important;
-    border-radius: 18px 18px 4px 18px !important;
-    color: #ffffff !important;
+.chat-wrap .chatbot {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
-/* ── Input area ── */
+.chat-wrap .message-wrap .message {
+    animation: msgSlide 0.35s ease-out;
+}
+
+@keyframes msgSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Input Row ─── */
 .input-row {
-    margin-top: 0.5rem !important;
+    animation: fadeIn 0.5s ease-out 0.3s both;
+    margin-top: 0.25rem !important;
 }
 
 .input-row textarea {
-    border-radius: 14px !important;
-    padding: 0.85rem 1rem !important;
-    font-size: 0.92rem !important;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    border-radius: 12px !important;
+    padding: 0.8rem 1rem !important;
+    font-size: 0.9rem !important;
+    background: rgba(15, 17, 30, 0.95) !important;
+    border: 1px solid rgba(99, 102, 241, 0.12) !important;
+    color: #e2e8f0 !important;
+    resize: none !important;
 }
 
 .input-row textarea:focus {
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15) !important;
+    border-color: rgba(99, 102, 241, 0.35) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08) !important;
+    outline: none !important;
 }
 
 .send-btn {
-    border-radius: 14px !important;
+    border-radius: 12px !important;
     font-weight: 600 !important;
-    font-size: 0.88rem !important;
-    letter-spacing: 0.02em !important;
-    transition: all 0.2s ease !important;
-    min-height: 46px !important;
+    font-size: 0.85rem !important;
+    min-height: 44px !important;
+    background: #6366f1 !important;
+    border: none !important;
+    color: #fff !important;
+    cursor: pointer !important;
 }
 
 .send-btn:hover {
+    background: #818cf8 !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25) !important;
 }
 
-/* ── Quick questions ── */
-#quick-questions {
-    text-align: center;
-    padding: 0.75rem 0 0.25rem;
+.send-btn:active {
+    transform: translateY(0) !important;
 }
 
-#quick-questions .label {
-    color: #475569;
-    font-size: 0.75rem;
+/* ─── Quick Questions ─── */
+.quick-section {
+    animation: fadeIn 0.5s ease-out 0.4s both;
+    padding: 1rem 0 0.5rem;
+}
+
+.quick-label {
+    color: #334155;
+    font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.6rem;
+    letter-spacing: 0.1em;
     font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.6rem;
 }
 
-.chip-row {
-    display: flex;
-    flex-wrap: wrap;
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
-    justify-content: center;
 }
 
-.chip {
-    display: inline-block;
-    padding: 8px 16px;
-    border: 1px solid rgba(99, 102, 241, 0.2);
-    border-radius: 24px;
-    background: rgba(20, 22, 45, 0.6);
-    color: #a5b4fc;
-    font-size: 0.82rem;
+.quick-card {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(99, 102, 241, 0.1);
+    background: rgba(15, 17, 30, 0.6);
+    color: #94a3b8;
+    font-size: 0.8rem;
+    line-height: 1.4;
     cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    font-weight: 500;
+    text-align: left;
+    font-weight: 400;
 }
 
-.chip:hover {
-    border-color: rgba(129, 140, 248, 0.5);
-    background: rgba(99, 102, 241, 0.1);
+.quick-card:hover {
+    border-color: rgba(99, 102, 241, 0.3);
+    background: rgba(99, 102, 241, 0.06);
     color: #c7d2fe;
     transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* ── Links footer ── */
-#footer-links {
+.quick-card:active {
+    transform: translateY(0);
+}
+
+.quick-card .card-icon {
+    font-size: 0.9rem;
+    margin-right: 4px;
+}
+
+/* ─── Footer ─── */
+.footer-section {
+    animation: fadeIn 0.5s ease-out 0.5s both;
     text-align: center;
-    padding: 1rem 0 0.5rem;
-    border-top: 1px solid rgba(99, 102, 241, 0.08);
-    margin-top: 0.5rem;
+    padding: 1.25rem 0 0.5rem;
+    border-top: 1px solid rgba(99, 102, 241, 0.06);
+    margin-top: 0.75rem;
 }
 
-#footer-links a {
-    color: #64748b;
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+.footer-link {
+    color: #475569;
     text-decoration: none;
-    margin: 0 1rem;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 500;
-    letter-spacing: 0.02em;
-    transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
-#footer-links a:hover {
+.footer-link:hover {
     color: #a5b4fc;
 }
 
-.footer-divider {
+.footer-credit {
     color: #1e293b;
-    margin: 0 0.25rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
 }
 
-#footer-credit {
-    text-align: center;
-    color: #334155;
-    font-size: 0.7rem;
-    padding: 0.25rem 0 1rem;
-}
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 5px; }
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-    background: rgba(99, 102, 241, 0.2);
-    border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(99, 102, 241, 0.4);
-}
+::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.15); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.3); }
 
-/* ── Responsive ── */
+/* ─── Responsive ─── */
 @media (max-width: 640px) {
-    .hero-title { font-size: 1.5rem; }
-    .chip { font-size: 0.78rem; padding: 6px 12px; }
-    #footer-links a { margin: 0 0.5rem; }
+    .hero h1 { font-size: 1.4rem; }
+    .quick-grid { grid-template-columns: 1fr; }
+    .footer-links { gap: 1rem; }
 }
 """
 
 
-# --- Quick question chips (handled via JS) ---
+# --- Quick questions ---
 
 QUICK_QUESTIONS = [
-    "Tell me about yourself",
-    "Deloitte experience?",
-    "Tech stack",
-    "Open to work?",
-    "Hackathon win",
-    "Projects",
+    {"icon": "👋", "text": "Tell me about yourself and your background"},
+    {"icon": "💼", "text": "What's your experience at Deloitte like?"},
+    {"icon": "🛠", "text": "What tech stack and tools do you work with?"},
+    {"icon": "🏆", "text": "How did you win the HackNow hackathon?"},
+    {"icon": "🚀", "text": "What are some projects you've built?"},
+    {"icon": "📬", "text": "Are you open to new opportunities?"},
 ]
 
 
@@ -365,79 +392,85 @@ QUICK_QUESTIONS = [
 
 with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
 
-    # Hero header
-    gr.HTML(f"""
-        <div id="hero-section">
-            <img class="hero-avatar"
-                 src="https://api.dicebear.com/9.x/initials/svg?seed=AM&backgroundColor=4338ca&textColor=ffffff"
-                 alt="AM" />
-            <h1 class="hero-title">Chat with Aaditya</h1>
-            <p class="hero-subtitle">
-                AI-powered portfolio assistant — trained on my real background,
-                projects, and experience
-            </p>
-            <div class="hero-status">
-                <span class="pulse"></span> Online
+    # Hero
+    gr.HTML("""
+        <div class="hero">
+            <div class="hero-avatar-ring">
+                <img src="https://api.dicebear.com/9.x/initials/svg?seed=AM&backgroundColor=4338ca&textColor=ffffff"
+                     alt="AM" />
+            </div>
+            <h1>Chat with Aaditya</h1>
+            <p>AI portfolio assistant — ask about my work, skills, or experience</p>
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                Online &middot; Powered by Gemini
             </div>
         </div>
     """)
 
     # Chatbot
     chatbot = gr.Chatbot(
-        height=460,
+        height=440,
         avatar_images=(
             None,
             "https://api.dicebear.com/9.x/initials/svg?seed=AM&backgroundColor=4338ca&textColor=ffffff",
         ),
-        elem_classes=["chat-area"],
+        elem_classes=["chat-wrap"],
         layout="bubble",
-        placeholder="Start a conversation — say hi, ask about my work, or pick a question below!",
+        placeholder="Say hi or pick a question below to get started →",
         buttons=["copy"],
     )
 
-    # Input row
+    # Input
     with gr.Row(elem_classes=["input-row"]):
         msg = gr.Textbox(
-            placeholder="Type your message...",
+            placeholder="Ask me anything...",
             show_label=False,
             scale=8,
             container=False,
             autofocus=True,
         )
         send_btn = gr.Button(
-            "Send ↗",
+            "Send",
             variant="primary",
             scale=1,
-            min_width=90,
+            min_width=80,
             elem_classes=["send-btn"],
         )
 
-    # Quick question chips (pure HTML + JS)
-    chips_html = "".join(
-        f'<span class="chip" onclick="'
-        f"document.querySelector('.input-row textarea').value = '{q}';"
+    # Quick questions grid
+    cards_html = "".join(
+        f'<div class="quick-card" onclick="'
+        f"document.querySelector('.input-row textarea').value = '{q['text']}';"
         f"document.querySelector('.input-row textarea').dispatchEvent(new Event('input', {{bubbles: true}}));"
-        f'">{q}</span>'
+        f"document.querySelector('.input-row textarea').focus();"
+        f'">'
+        f'<span class="card-icon">{q["icon"]}</span> {q["text"]}'
+        f'</div>'
         for q in QUICK_QUESTIONS
     )
     gr.HTML(f"""
-        <div id="quick-questions">
-            <div class="label">Quick Questions</div>
-            <div class="chip-row">{chips_html}</div>
+        <div class="quick-section">
+            <div class="quick-label">Suggested Questions</div>
+            <div class="quick-grid">{cards_html}</div>
         </div>
     """)
 
-    # Footer links
+    # Footer
     gr.HTML("""
-        <div id="footer-links">
-            <a href="https://portfolio-aaditya-mittal.vercel.app/" target="_blank">Portfolio</a>
-            <span class="footer-divider">·</span>
-            <a href="https://www.linkedin.com/in/aadityamittal01" target="_blank">LinkedIn</a>
-            <span class="footer-divider">·</span>
-            <a href="https://github.com/Aaditya-Mittal" target="_blank">GitHub</a>
-        </div>
-        <div id="footer-credit">
-            Built with CrewAI + Gemini · Powered by RAG
+        <div class="footer-section">
+            <div class="footer-links">
+                <a class="footer-link" href="https://portfolio-aaditya-mittal.vercel.app/" target="_blank">
+                    🌐 Portfolio
+                </a>
+                <a class="footer-link" href="https://www.linkedin.com/in/aadityamittal01" target="_blank">
+                    💼 LinkedIn
+                </a>
+                <a class="footer-link" href="https://github.com/Aaditya-Mittal" target="_blank">
+                    🐙 GitHub
+                </a>
+            </div>
+            <div class="footer-credit">Built with CrewAI + Gemini · RAG-powered</div>
         </div>
     """)
 
