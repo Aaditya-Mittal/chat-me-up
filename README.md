@@ -1,54 +1,219 @@
-# ChatWithMe Crew
+<div align="center">
 
-Welcome to the ChatWithMe Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+# 💬 Chat Me Up
 
-## Installation
+**An AI-powered portfolio chatbot that represents me in my own voice.**
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+Built with [CrewAI](https://crewai.com) · Powered by [Gemini](https://deepmind.google/technologies/gemini/) · Served via [Gradio](https://gradio.app)
 
-First, if you haven't already, install uv:
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
+[![CrewAI](https://img.shields.io/badge/CrewAI-1.14+-FF6B35?style=flat-square)](https://crewai.com)
+[![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-4285F4?style=flat-square&logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
+[![Gradio](https://img.shields.io/badge/Gradio-6.x-F97316?style=flat-square)](https://gradio.app)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
-```bash
-pip install uv
+</div>
+
+---
+
+## 🤔 What is this?
+
+Portfolio websites are static — visitors browse, read, and leave. **Chat Me Up** changes that by letting visitors have a real conversation with an AI version of me.
+
+It's not a generic chatbot. It's trained on my actual background, experiences, projects, and personality — so it responds the way I would: conversationally, authentically, with real stories and genuine enthusiasm.
+
+> **Ask it about my hackathon wins, Deloitte experience, tech stack, or even how I learned Flutter in 2 days — it'll tell you the story, not just the facts.**
+
+---
+
+## ✨ Features
+
+- **🎭 Authentic Persona** — Speaks in first person with my real communication style, humor, and personality quirks
+- **📚 RAG-Powered Knowledge** — Retrieves answers from a curated knowledge base (about me, resume, projects) — never fabricates information
+- **🧠 Conversation Context** — Maintains chat history within a session for natural multi-turn conversations
+- **🎯 Adaptive Responses** — Adjusts tone and depth for recruiters, developers, students, and casual visitors
+- **🛡️ Guardrails** — Won't discuss personal finances, confidential work, or anything off-limits
+- **💅 Premium UI** — Dark-themed Gradio interface with smooth animations, quick-question cards, and social links
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│                  Gradio UI (app.py)              │
+│  ┌───────────┐  ┌───────────┐  ┌─────────────┐  │
+│  │ Chat Area │  │ Input Box │  │ Quick Cards │  │
+│  └─────┬─────┘  └─────┬─────┘  └──────┬──────┘  │
+│        │              │               │          │
+│        └──────────────┼───────────────┘          │
+│                       │                          │
+│              ┌────────▼────────┐                 │
+│              │ History Context │                 │
+│              └────────┬────────┘                 │
+└───────────────────────┼──────────────────────────┘
+                        │
+              ┌─────────▼─────────┐
+              │   CrewAI Crew     │
+              │   (crew.py)       │
+              │                   │
+              │  ┌─────────────┐  │
+              │  │ Persona     │  │
+              │  │ Agent       │  │
+              │  │ (Gemini)    │  │
+              │  └──────┬──────┘  │
+              │         │         │
+              │  ┌──────▼──────┐  │
+              │  │ Knowledge   │  │
+              │  │ RAG Search  │  │
+              │  │ (Embeddings)│  │
+              │  └──────┬──────┘  │
+              │         │         │
+              │  ┌──────▼──────┐  │
+              │  │ about_me.md │  │
+              │  │ resume.md   │  │
+              │  └─────────────┘  │
+              └───────────────────┘
 ```
 
-Next, navigate to your project directory and install the dependencies:
+---
 
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
+## 📁 Project Structure
+
 ```
-### Customizing
-
-**Add your `OPENAI_API_KEY` into the `.env` file**
-
-- Modify `src/chat_with_me/config/agents.yaml` to define your agents
-- Modify `src/chat_with_me/config/tasks.yaml` to define your tasks
-- Modify `src/chat_with_me/crew.py` to add your own logic, tools and specific args
-- Modify `src/chat_with_me/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
-
-```bash
-$ crewai run
+chat_with_me/
+├── src/chat_with_me/
+│   ├── app.py                 # Gradio chat interface
+│   ├── crew.py                # CrewAI crew definition + knowledge sources
+│   ├── main.py                # CLI entry point (crewai run)
+│   └── config/
+│       ├── agents.yaml        # Agent persona, personality, storytelling rules
+│       └── tasks.yaml         # Response strategy, quality checklist, examples
+├── knowledge/
+│   ├── about_me.md            # Personal background, journey, personality
+│   └── resume.md              # Experience, projects, skills, achievements
+├── pyproject.toml             # Dependencies & build config
+├── .env                       # API keys (not committed)
+└── .gitignore
 ```
 
-This command initializes the chat_with_me Crew, assembling the agents and assigning them tasks as defined in your configuration.
+---
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+## 🚀 Getting Started
 
-## Understanding Your Crew
+### Prerequisites
 
-The chat_with_me Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+- **Python** 3.10 - 3.13
+- **[uv](https://docs.astral.sh/uv/)** — fast Python package manager
+- **Google API Key** — for Gemini LLM and embeddings ([Get one here](https://aistudio.google.com/apikey))
 
-## Support
+### Installation
 
-For support, questions, or feedback regarding the ChatWithMe Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+```bash
+# Clone the repo
+git clone https://github.com/Aaditya-Mittal/chat-me-up.git
+cd chat-me-up
 
-Let's create wonders together with the power and simplicity of crewAI.
+# Install dependencies
+uv sync
+```
+
+### Configuration
+
+Create a `.env` file in the project root:
+
+```env
+MODEL=gemini/gemini-2.5-flash
+GOOGLE_API_KEY=your_google_api_key_here
+EMBEDDINGS_GOOGLE_GENERATIVE_AI_MODEL_NAME=gemini-embedding-001
+```
+
+### Running
+
+**Gradio Chat UI (recommended):**
+
+```bash
+uv run python -m chat_with_me.app
+# Opens at http://localhost:7860
+```
+
+**CLI mode (single query):**
+
+```bash
+crewai run
+```
+
+---
+
+## 🧩 How It Works
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| **LLM** | Gemini 2.5 Flash | Generates conversational responses |
+| **Orchestration** | CrewAI | Agent/task framework with persona configuration |
+| **Knowledge** | RAG + Google Embeddings | Retrieves relevant facts from markdown knowledge base |
+| **Frontend** | Gradio 6.x | Interactive chat interface with dark theme |
+| **History** | In-context injection | Full conversation passed to each crew kickoff |
+
+### Agent Configuration
+
+The agent's personality is defined in `agents.yaml` with:
+
+- **7 signature stories** — go-to narratives the agent tells naturally (ISRO spark, Flutter in 2 days, pandemic reset, etc.)
+- **Emotional intelligence** — adapts tone based on visitor mood (enthusiastic, skeptical, casual, etc.)
+- **Good vs bad examples** — 3 side-by-side comparisons teaching natural vs robotic responses
+- **Anti-patterns** — 10 things the agent must never do
+
+### Task Configuration
+
+The task in `tasks.yaml` follows a 3-step pipeline:
+
+1. **Analyze** — classify message type, read tone, check history
+2. **Craft** — apply the right strategy from 16 message type handlers
+3. **Quality Check** — 10-point checklist before responding
+
+---
+
+## 🛠️ Tech Stack
+
+| Category | Technologies |
+|---|---|
+| **Language** | Python 3.12 |
+| **AI Framework** | CrewAI 1.14+ |
+| **LLM** | Google Gemini 2.5 Flash |
+| **Embeddings** | Google `gemini-embedding-001` |
+| **Frontend** | Gradio 6.x |
+| **Package Manager** | uv |
+| **Build System** | Hatchling |
+
+---
+
+## 🔧 Customization
+
+Want to build your own persona chatbot? Here's what to change:
+
+1. **`knowledge/about_me.md`** — Replace with your personal story, journey, and personality
+2. **`knowledge/resume.md`** — Replace with your experience, projects, and skills
+3. **`config/agents.yaml`** — Update the backstory, signature stories, and communication style
+4. **`config/tasks.yaml`** — Adjust response strategies and quality criteria
+5. **`app.py`** — Update the header, avatar, quick questions, and social links
+
+---
+
+## 🤝 Contributing
+
+This is a personal project, but ideas and feedback are welcome! Feel free to:
+
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feature/cool-idea`)
+3. Commit your changes (`git commit -m "Add cool idea"`)
+4. Push to the branch (`git push origin feature/cool-idea`)
+5. Open a Pull Request
+
+---
+
+<div align="center">
+
+**Built by [Aaditya Mittal](https://portfolio-aaditya-mittal.vercel.app/)** · [LinkedIn](https://www.linkedin.com/in/aadityamittal01) · [GitHub](https://github.com/Aaditya-Mittal)
+
+</div>
