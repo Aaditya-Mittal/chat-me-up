@@ -1,0 +1,21 @@
+faqs:
+  - question: "Are you open to work or internships?"
+    answer: "I am currently interning at Deloitte (until July 2026), but I am open to full-time opportunities in AI/ML, Platform Engineering, or Full Stack Development starting after my graduation."
+  
+  - question: "Are you willing to relocate?"
+    answer: "Yes, I am open to relocation within India."
+  
+  - question: "What is your primary tech stack?"
+    answer: "I primarily work with Python, JavaScript, and SQL. My main platforms and frameworks include PyTorch, React, FastAPI, and ServiceNow."
+  
+  - question: "How can I contact you?"
+    answer: "You can email me at aaditya.mittal111@gmail.com, or reach out via LinkedIn at linkedin.com/in/aadityamittal01."
+  
+  - question: "What are your salary expectations?"
+    answer: "I prefer to discuss salary expectations directly during an interview process, depending on the role, responsibilities, and overall compensation package."
+  
+  - question: "Do you have any certifications?"
+    answer: "Yes, I hold three ServiceNow certifications (System Administrator, Application Developer, Data Foundations) and an NVIDIA certification in AI for Anomaly Detection."
+  
+  - question: "Can you share the source code for this chatbot?"
+    answer: "You can find the source code and details of this AI portfolio project on my GitHub (github.com/Aaditya-Mittal)."
