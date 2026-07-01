@@ -5,6 +5,10 @@ A premium dark-themed chat UI wrapping the CrewAI persona agent.
 """
 
 import warnings
+import os
+import datetime
+import tempfile
+import google.generativeai as genai
 
 import gradio as gr
 
@@ -34,12 +38,34 @@ def format_history(history: list[dict]) -> str:
 
 # --- Event handlers ---
 
-def user_message(message, history):
-    """Append user message to history and clear input."""
-    if not message.strip():
-        return "", history
-    history = history + [{"role": "user", "content": message}]
-    return "", history
+def transcribe_audio(audio_path):
+    if not audio_path:
+        return ""
+    try:
+        genai.configure(api_key=os.environ.get('GOOGLE_API_KEY'))
+        audio_file = genai.upload_file(path=audio_path)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = model.generate_content([
+            "Transcribe this audio exactly as spoken. Only return the transcribed text, nothing else.",
+            audio_file
+        ])
+        return response.text.strip()
+    except Exception as e:
+        print(f"Transcription error: {e}")
+        return ""
+
+
+def user_message(text_msg, audio_path, history):
+    """Append user message (or transcribed audio) to history and clear input."""
+    message = text_msg
+    if audio_path:
+        message = transcribe_audio(audio_path)
+        
+    if not message or not message.strip():
+        return "", None, history
+        
+    history = history + [{"role": "user", "content": message.strip()}]
+    return "", None, history
 
 
 def bot_response(history):
@@ -51,13 +77,20 @@ def bot_response(history):
     prior = history[:-1]
 
     history_text = format_history(prior)
+    
+    # Inject current date context
+    now = datetime.datetime.now()
+    date_str = now.strftime("%B %d, %Y")
+    system_context = f"[System Context: The current date is {date_str}. Keep this timeline in mind.]"
+
     if history_text:
         full_message = (
+            f"{system_context}\n\n"
             f"Previous conversation:\n{history_text}\n\n"
             f"New message from visitor: {user_msg}"
         )
     else:
-        full_message = user_msg
+        full_message = f"{system_context}\n\nNew message from visitor: {user_msg}"
 
     try:
         result = crew_instance.kickoff(inputs={"user_message": full_message})
@@ -67,6 +100,20 @@ def bot_response(history):
 
     history = history + [{"role": "assistant", "content": reply}]
     return history
+
+
+def export_chat(history):
+    text = format_history(history)
+    fd, path = tempfile.mkstemp(suffix=".txt", prefix="chat_history_")
+    with os.fdopen(fd, 'w', encoding='utf-8') as f:
+        f.write(text)
+    return path
+
+
+def undo_last(history):
+    if len(history) >= 2:
+        return history[:-2]
+    return []
 
 
 # --- Theme ---
@@ -426,9 +473,23 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
         msg = gr.Textbox(
             placeholder="Ask me anything...",
             show_label=False,
-            scale=8,
+            scale=7,
             container=False,
             autofocus=True,
+        )
+        audio = gr.Audio(
+            sources=["microphone"], 
+            type="filepath", 
+            scale=1, 
+            show_label=False, 
+            container=False,
+            min_width=60,
+            waveform_options=gr.WaveformOptions(
+                waveform_color="#6366f1",
+                waveform_progress_color="#818cf8",
+                skip_length=2,
+                show_controls=False,
+            )
         )
         send_btn = gr.Button(
             "Send",
@@ -437,6 +498,11 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
             min_width=80,
             elem_classes=["send-btn"],
         )
+
+    with gr.Row(elem_classes=["tools-row"]):
+        clear_btn = gr.Button("🗑️ Clear Chat", size="sm", min_width=60)
+        undo_btn = gr.Button("↩️ Undo Last", size="sm", min_width=60)
+        download_btn = gr.DownloadButton("💾 Export Chat", size="sm", min_width=60)
 
     # Quick questions grid
     cards_html = "".join(
@@ -475,12 +541,15 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
     """)
 
     # Event wiring
-    msg.submit(user_message, [msg, chatbot], [msg, chatbot], queue=False).then(
+    msg.submit(user_message, [msg, audio, chatbot], [msg, audio, chatbot], queue=False).then(
         bot_response, chatbot, chatbot
     )
-    send_btn.click(user_message, [msg, chatbot], [msg, chatbot], queue=False).then(
+    send_btn.click(user_message, [msg, audio, chatbot], [msg, audio, chatbot], queue=False).then(
         bot_response, chatbot, chatbot
     )
+    clear_btn.click(lambda: [], None, chatbot, queue=False)
+    undo_btn.click(undo_last, chatbot, chatbot, queue=False)
+    download_btn.click(export_chat, inputs=[chatbot], outputs=[download_btn])
 
 
 if __name__ == "__main__":
