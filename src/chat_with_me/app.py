@@ -41,8 +41,13 @@ def format_history(history: list[dict]) -> str:
 def transcribe_audio(audio_path):
     if not audio_path:
         return ""
+    api_key = os.environ.get('GOOGLE_API_KEY')
+    if not api_key:
+        print("Transcription error: GOOGLE_API_KEY is not set.")
+        return "I'm sorry, voice input is currently unavailable due to missing API configuration."
+        
     try:
-        genai.configure(api_key=os.environ.get('GOOGLE_API_KEY'))
+        genai.configure(api_key=api_key)
         audio_file = genai.upload_file(path=audio_path)
         model = genai.GenerativeModel('gemini-1.5-flash')
         response = model.generate_content([
@@ -52,7 +57,7 @@ def transcribe_audio(audio_path):
         return response.text.strip()
     except Exception as e:
         print(f"Transcription error: {e}")
-        return ""
+        return "I couldn't quite hear that clearly. Could you try typing it?"
 
 
 def user_message(text_msg, audio_path, history):
@@ -64,7 +69,10 @@ def user_message(text_msg, audio_path, history):
     if not message or not message.strip():
         return "", None, history
         
-    history = history + [{"role": "user", "content": message.strip()}]
+    # Security: Limit input length to prevent token exhaustion or buffer overflow attempts
+    message = message.strip()[:1000]
+        
+    history = history + [{"role": "user", "content": message}]
     return "", None, history
 
 
