@@ -28,12 +28,13 @@ It's not a generic chatbot. It's trained on my actual background, experiences, p
 
 ## ✨ Features
 
+- **🎤 Voice Input** — Speak your questions directly to the bot using native Gemini audio transcription
 - **🎭 Authentic Persona** — Speaks in first person with my real communication style, humor, and personality quirks
-- **📚 RAG-Powered Knowledge** — Retrieves answers from a curated knowledge base (about me, resume, projects) — never fabricates information
-- **🧠 Conversation Context** — Maintains chat history within a session for natural multi-turn conversations
-- **🎯 Adaptive Responses** — Adjusts tone and depth for recruiters, developers, students, and casual visitors
-- **🛡️ Guardrails** — Won't discuss personal finances, confidential work, or anything off-limits
-- **💅 Premium UI** — Dark-themed Gradio interface with smooth animations, quick-question cards, and social links
+- **📚 RAG-Powered Knowledge** — Retrieves answers from a curated knowledge base (about me, resume, deep-dive projects, and FAQs)
+- **🧠 Conversation Context & Time** — Maintains chat history and knows the current real-world date and time
+- **🛡️ Enterprise-Grade Security** — Built-in protection against prompt injection, jailbreaks, and token-exhaustion
+- **💾 Export Chat** — Recruiters can download a `.txt` transcript of their entire conversation with 1-click
+- **💅 Premium UI** — Dark-themed Gradio interface with quick-question cards, Clear/Undo controls, and smooth animations
 
 ---
 
@@ -83,15 +84,17 @@ It's not a generic chatbot. It's trained on my actual background, experiences, p
 ```
 chat_with_me/
 ├── src/chat_with_me/
-│   ├── app.py                 # Gradio chat interface
+│   ├── app.py                 # Gradio UI + Audio transcription + Chat Export
 │   ├── crew.py                # CrewAI crew definition + knowledge sources
 │   ├── main.py                # CLI entry point (crewai run)
 │   └── config/
-│       ├── agents.yaml        # Agent persona, personality, storytelling rules
-│       └── tasks.yaml         # Response strategy, quality checklist, examples
+│       ├── agents.yaml        # Persona, storytelling rules, and ethical boundaries
+│       └── tasks.yaml         # Response strategies and XML prompt injection defenses
 ├── knowledge/
 │   ├── about_me.md            # Personal background, journey, personality
-│   └── resume.md              # Experience, projects, skills, achievements
+│   ├── resume.md              # Experience, skills, achievements
+│   ├── projects.md            # Deep technical dives into key projects
+│   └── faq.yaml               # Common recruiter/visitor questions
 ├── pyproject.toml             # Dependencies & build config
 ├── .env                       # API keys (not committed)
 └── .gitignore
@@ -149,11 +152,12 @@ crewai run
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| **LLM** | Gemini 2.5 Flash | Generates conversational responses |
+| **LLM** | Gemini 1.5/2.5 Flash | Generates conversational responses and natively transcribes audio |
 | **Orchestration** | CrewAI | Agent/task framework with persona configuration |
-| **Knowledge** | RAG + Google Embeddings | Retrieves relevant facts from markdown knowledge base |
-| **Frontend** | Gradio 6.x | Interactive chat interface with dark theme |
-| **History** | In-context injection | Full conversation passed to each crew kickoff |
+| **Knowledge** | RAG + Google Embeddings | Retrieves relevant facts from markdown/YAML knowledge base |
+| **Frontend** | Gradio 6.x | Interactive chat interface with dark theme and voice capabilities |
+| **History** | In-context injection | Full conversation and dynamic date/time passed to kickoff |
+| **Security** | XML Wrapping & Limits | Prevents prompt injections, jailbreaks, and token exhaustion |
 
 ### Agent Configuration
 
@@ -192,10 +196,10 @@ The task in `tasks.yaml` follows a 3-step pipeline:
 
 Want to build your own persona chatbot? Here's what to change:
 
-1. **`knowledge/about_me.md`** — Replace with your personal story, journey, and personality
-2. **`knowledge/resume.md`** — Replace with your experience, projects, and skills
-3. **`config/agents.yaml`** — Update the backstory, signature stories, and communication style
-4. **`config/tasks.yaml`** — Adjust response strategies and quality criteria
+1. **`knowledge/about_me.md` & `resume.md`** — Replace with your personal story, journey, and experience
+2. **`knowledge/projects.md` & `faq.yaml`** — Add your technical deep dives and common questions
+3. **`config/agents.yaml`** — Update the backstory, signature stories, and ethical boundaries
+4. **`config/tasks.yaml`** — Adjust response strategies and injection defenses
 5. **`app.py`** — Update the header, avatar, quick questions, and social links
 
 ---
