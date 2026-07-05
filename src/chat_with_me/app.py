@@ -8,7 +8,7 @@ import warnings
 import os
 import datetime
 import tempfile
-import google.generativeai as genai
+from google import genai
 
 import gradio as gr
 
@@ -47,13 +47,15 @@ def transcribe_audio(audio_path):
         return "I'm sorry, voice input is currently unavailable due to missing API configuration."
         
     try:
-        genai.configure(api_key=api_key)
-        audio_file = genai.upload_file(path=audio_path)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content([
-            "Transcribe this audio exactly as spoken. Only return the transcribed text, nothing else.",
-            audio_file
-        ])
+        client = genai.Client(api_key=api_key)
+        audio_file = client.files.upload(file=audio_path)
+        response = client.models.generate_content(
+            model='gemini-1.5-flash',
+            contents=[
+                "Transcribe this audio exactly as spoken. Only return the transcribed text, nothing else.",
+                audio_file
+            ]
+        )
         return response.text.strip()
     except Exception as e:
         print(f"Transcription error: {e}")
@@ -495,8 +497,6 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
             waveform_options=gr.WaveformOptions(
                 waveform_color="#6366f1",
                 waveform_progress_color="#818cf8",
-                skip_length=2,
-                show_controls=False,
             )
         )
         send_btn = gr.Button(
