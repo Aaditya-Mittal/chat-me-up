@@ -81,10 +81,15 @@ def user_message(text_msg, audio_path, history):
 def bot_response(history):
     """Generate bot response using the CrewAI crew."""
     if not history:
-        return history
+        yield history
+        return
 
     user_msg = history[-1]["content"]
     prior = history[:-1]
+    
+    # Append a thinking state
+    history = history + [{"role": "assistant", "content": "🤔 *Thinking...*"}]
+    yield history
 
     history_text = format_history(prior)
     
@@ -108,8 +113,9 @@ def bot_response(history):
     except Exception as e:
         reply = f"Hmm, something went wrong on my end. Mind trying again? (Error: {str(e)[:120]})"
 
-    history = history + [{"role": "assistant", "content": reply}]
-    return history
+    # Replace the thinking state with the actual reply
+    history[-1]["content"] = reply
+    yield history
 
 
 def export_chat(history):
@@ -513,22 +519,15 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
         download_btn = gr.DownloadButton("💾 Export Chat", size="sm", min_width=60)
 
     # Quick questions grid
-    cards_html = "".join(
-        f'<div class="quick-card" onclick="'
-        f"document.querySelector('.input-row textarea').value = '{q['text']}';"
-        f"document.querySelector('.input-row textarea').dispatchEvent(new Event('input', {{bubbles: true}}));"
-        f"document.querySelector('.input-row textarea').focus();"
-        f'">'
-        f'<span class="card-icon">{q["icon"]}</span> {q["text"]}'
-        f'</div>'
-        for q in QUICK_QUESTIONS
-    )
-    gr.HTML(f"""
+    gr.HTML("""
         <div class="quick-section">
             <div class="quick-label">Suggested Questions</div>
-            <div class="quick-grid">{cards_html}</div>
         </div>
     """)
+    with gr.Row(elem_classes=["quick-grid"]):
+        for q in QUICK_QUESTIONS:
+            btn = gr.Button(f"{q['icon']} {q['text']}", elem_classes=["quick-card"])
+            btn.click(lambda text=q['text']: text, inputs=None, outputs=[msg])
 
     # Footer
     gr.HTML("""
