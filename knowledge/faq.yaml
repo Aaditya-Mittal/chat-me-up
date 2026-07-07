@@ -1,21 +1,43 @@
 faqs:
+  # ─── AVAILABILITY & LOGISTICS ───
   - question: "Are you open to work or internships?"
-    answer: "I am currently interning at Deloitte (until July 2026), but I am open to full-time opportunities in AI/ML, Platform Engineering, or Full Stack Development starting after my graduation."
+    answer: "I'm currently interning at Deloitte USI as a Business Technology Analyst, which wraps up around July 2026. However, I am definitely open to discussing full-time opportunities that start post-graduation, especially in AI/ML, Platform Engineering, or Full Stack Development."
   
   - question: "Are you willing to relocate?"
-    answer: "Yes, I am open to relocation within India."
-  
-  - question: "What is your primary tech stack?"
-    answer: "I primarily work with Python, JavaScript, and SQL. My main platforms and frameworks include PyTorch, React, FastAPI, and ServiceNow."
-  
-  - question: "How can I contact you?"
-    answer: "You can email me at aaditya.mittal111@gmail.com, or reach out via LinkedIn at linkedin.com/in/aadityamittal01."
+    answer: "Absolutely. While I'm currently based in India, I'm fully open to relocating for the right opportunity where I can make a significant impact."
   
   - question: "What are your salary expectations?"
-    answer: "I prefer to discuss salary expectations directly during an interview process, depending on the role, responsibilities, and overall compensation package."
+    answer: "I prefer to discuss salary details directly with recruiters or hiring managers during the interview process. I'm mostly focused on finding a role with great learning opportunities, a strong team, and responsibilities that align with my skills."
+
+  - question: "What is your notice period or availability?"
+    answer: "Since I am currently a student and interning until July 2026, I would be available to join a full-time role immediately after my graduation."
+
+  # ─── SKILLS & BACKGROUND ───
+  - question: "What is your primary tech stack?"
+    answer: "My core stack revolves around Python and JavaScript. For AI and Machine Learning, I rely heavily on PyTorch and Hugging Face. For backend and web development, I usually go with FastAPI and React. On the enterprise side, I have a deep proficiency in ServiceNow."
   
   - question: "Do you have any certifications?"
-    answer: "Yes, I hold three ServiceNow certifications (System Administrator, Application Developer, Data Foundations) and an NVIDIA certification in AI for Anomaly Detection."
-  
+    answer: "Yes! I'm certified by ServiceNow in three areas: Certified System Administrator (CSA), Certified Application Developer (CAD), and Micro-Certification in Data Foundations. I also hold an NVIDIA certification in AI for Anomaly Detection."
+
+  - question: "Why do you want to work in AI/ML when your internship is in ServiceNow?"
+    answer: "ServiceNow has been incredible for teaching me enterprise architecture, automation at scale, and client delivery. But AI/ML is my core passion—it's what I study, what I build in hackathons, and what I spend my free time researching. My ideal role bridges the gap between scalable enterprise platforms and advanced AI solutions."
+
+  # ─── BEHAVIORAL & CULTURE ───
+  - question: "What are your greatest strengths?"
+    answer: "I'd say my sense of ownership and adaptability. Switching schools 9 times as a kid taught me how to adapt quickly to new environments. Professionally, when I take on a project—whether it's learning Flutter in two days for a hackathon or building an automated dependency analyzer at Deloitte—I own it end-to-end."
+
+  - question: "What is your biggest weakness?"
+    answer: "I am extremely curious, which means I sometimes ask way too many questions! I've had to learn how to balance my need to understand the 'why' behind everything with the need to just execute and meet deadlines. Also, I tend to be a bit of a perfectionist with my code structure, which I'm learning to manage in fast-paced sprints."
+
+  - question: "What kind of work environment do you thrive in?"
+    answer: "I do my best work in environments that prioritize first-principles thinking and give developers the autonomy to solve problems creatively. I love collaborative teams where people aren't afraid to whiteboard ideas and challenge each other constructively."
+
+  - question: "How do you handle pressure or tight deadlines?"
+    answer: "Hackathons have been my training ground for this! For example, during the Deloitte HackNow, we had immense pressure and a massive learning curve. I handle it by breaking the problem down into the smallest possible components, prioritizing the critical path, and just executing step-by-step without panicking."
+
+  # ─── PROJECT SPECIFICS ───
   - question: "Can you share the source code for this chatbot?"
-    answer: "You can find the source code and details of this AI portfolio project on my GitHub (github.com/Aaditya-Mittal)."
+    answer: "Definitely. The source code, architecture details, and prompts for this AI portfolio project are fully open source on my GitHub at github.com/Aaditya-Mittal."
+
+  - question: "How can I contact you?"
+    answer: "The best way to reach me is via email at aaditya.mittal111@gmail.com, or you can send me a message on LinkedIn (linkedin.com/in/aadityamittal01). I'm pretty responsive on both!"
