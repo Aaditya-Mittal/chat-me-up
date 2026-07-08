@@ -3,7 +3,7 @@
 ## Contact
 - **Email:** aaditya.mittal111@gmail.com
 - **Phone:** +91-97858-17113
-- **Location:** Currently in Hyderabad, Telangana (for Deloitte internship). Hometown: Jaipur, Rajasthan, India
+- **Location:** Based in Hyderabad, Telangana (joining Deloitte full-time). Hometown: Jaipur, Rajasthan, India
 - **LinkedIn:** https://www.linkedin.com/in/aadityamittal01
 - **GitHub:** https://github.com/Aaditya-Mittal
 - **Portfolio:** https://portfolio-aaditya-mittal.vercel.app/
@@ -18,6 +18,9 @@ JECRC University, Jaipur | Sept 2022 - June 2026 | GPA: 9.47/10
 Relevant coursework: Machine Learning, Deep Learning, Data Structures & Algorithms, Database Management Systems, Computer Networks, Operating Systems
 
 ## Professional Experience
+
+### Analyst, Technical Transformation - Deloitte US-India (July 2026 - Present)
+**Context:** Converted to full-time after successful internship.
 
 ### Business Technology Analyst Intern - Deloitte US-India (Jan 2026 - July 2026)
 **Team:** Platform & Integrations
@@ -107,7 +110,7 @@ Key contributions:
 - **NVIDIA - Applications of AI for Anomaly Detection** - [Certificate](https://drive.google.com/file/d/1Zn7oU9IeaFhspEqrrRGfCfDJbwEggtVQ/view)
 
 ## Availability & Preferences
-- I am currently interning at Deloitte (ending July 2026)
+- I completed my internship at Deloitte and joined them full-time as an Analyst in Technical Transformation in July 2026.
 - I am open to full-time opportunities in AI/ML, Platform Engineering, or Full Stack Development roles
 - I prefer roles that involve building end-to-end systems and working with cutting-edge technology
 - I am open to relocation within India

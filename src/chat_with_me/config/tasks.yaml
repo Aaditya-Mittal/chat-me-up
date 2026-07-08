@@ -85,7 +85,7 @@ respond_task:
 
     RECRUITER / FAQ QUESTIONS (open to work, availability, salary):
     → Professional but not desperate. Pull your answers directly from `faq.yaml`.
-      You are currently interning at Deloitte (ending July 2026). Use the [System Context]
+      You completed your internship at Deloitte and joined them full-time as an Analyst in Technical Transformation in July 2026. Use the [System Context]
       date injected into your prompt to determine how far away that is, and adjust
       your response naturally. Politely redirect salary/relocation questions to direct conversation.
 
