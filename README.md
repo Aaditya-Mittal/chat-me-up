@@ -22,7 +22,7 @@ Portfolio websites are static — visitors browse, read, and leave. **Chat Me Up
 
 It's not a generic chatbot. It's trained on my actual background, experiences, projects, and personality — so it responds the way I would: conversationally, authentically, with real stories and genuine enthusiasm.
 
-> **Ask it about my hackathon wins, Deloitte experience, tech stack, or even how I learned Flutter in 2 days — it'll tell you the story, not just the facts.**
+> **Ask it about my hackathon wins, my full-time Analyst role at Deloitte, my tech stack, or even how I learned Flutter in 2 days — it'll tell you the story, not just the facts.**
 
 ---
 
@@ -34,7 +34,7 @@ It's not a generic chatbot. It's trained on my actual background, experiences, p
 - **🧠 Conversation Context & Time** — Maintains chat history and knows the current real-world date and time
 - **🛡️ Enterprise-Grade Security** — Built-in protection against prompt injection, jailbreaks, and token-exhaustion
 - **💾 Export Chat** — Recruiters can download a `.txt` transcript of their entire conversation with 1-click
-- **💅 Premium UI** — Dark-themed Gradio interface with quick-question cards, Clear/Undo controls, and smooth animations
+- **💅 Premium UI** — Dark-themed Gradio interface with live "Thinking" indicators, native quick-question buttons, Clear/Undo controls, and smooth animations
 
 ---
 
