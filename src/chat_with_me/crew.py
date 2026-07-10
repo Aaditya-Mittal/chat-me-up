@@ -2,6 +2,7 @@ import os
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
+from crewai import LLM
 from crewai.knowledge.source.text_file_knowledge_source import TextFileKnowledgeSource
 
 
@@ -24,6 +25,7 @@ class ChatWithMe():
         return Agent(
             config=self.agents_config['persona_agent'], # type: ignore[index]
             verbose=True,
+            llm=LLM(model=os.environ.get("MODEL", "gemini/gemini-2.5-flash"), api_key=os.environ.get("GOOGLE_API_KEY"))
         )
 
     @task
@@ -41,6 +43,6 @@ class ChatWithMe():
             process=Process.sequential,
             verbose=True,
             memory=False,
-            embedder={"provider":"google-generativeai", "config":{"model_name":"gemini-embedding-001", "api_key":os.environ.get('GOOGLE_API_KEY')}},
+            embedder={"provider": "google", "config": {"model": "models/embedding-001", "api_key": os.environ.get('GOOGLE_API_KEY')}},
             knowledge_sources=[self.text_source]
         )

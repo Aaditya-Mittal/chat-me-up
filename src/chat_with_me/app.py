@@ -8,6 +8,7 @@ import warnings
 import os
 import datetime
 import tempfile
+import threading
 from google import genai
 
 import gradio as gr
@@ -20,6 +21,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 # Initialize the crew once at startup
 print("Initializing ChatWithMe crew...")
 crew_instance = ChatWithMe().crew()
+crew_lock = threading.Lock()
 print("Crew ready!")
 
 
@@ -108,7 +110,8 @@ def bot_response(history):
         full_message = f"{system_context}\n\nNew message from visitor: {user_msg}"
 
     try:
-        result = crew_instance.kickoff(inputs={"user_message": full_message})
+        with crew_lock:
+            result = crew_instance.kickoff(inputs={"user_message": full_message})
         reply = result.raw
     except Exception as e:
         reply = f"Hmm, something went wrong on my end. Mind trying again? (Error: {str(e)[:120]})"
