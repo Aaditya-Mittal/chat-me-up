@@ -9,6 +9,7 @@ import os
 import datetime
 import tempfile
 import threading
+import time
 from google import genai
 
 import gradio as gr
@@ -116,9 +117,13 @@ def bot_response(history):
     except Exception as e:
         reply = f"Hmm, something went wrong on my end. Mind trying again? (Error: {str(e)[:120]})"
 
-    # Replace the thinking state with the actual reply
-    history[-1]["content"] = reply
-    yield history
+    # Replace the thinking state with the actual reply smoothly
+    history[-1]["content"] = ""
+    words = reply.split(' ')
+    for i, word in enumerate(words):
+        history[-1]["content"] += word + (" " if i < len(words) - 1 else "")
+        yield history
+        time.sleep(0.03)  # subtle typing delay
 
 
 def export_chat(history):
@@ -296,6 +301,22 @@ footer { display: none !important; }
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* ─── Premium Chat Bubbles ─── */
+.chat-wrap .message-wrap .message.user {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(167, 139, 250, 0.15)) !important;
+    border: 1px solid rgba(167, 139, 250, 0.3) !important;
+    border-radius: 18px 18px 0 18px !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.chat-wrap .message-wrap .message.bot {
+    background: rgba(30, 33, 54, 0.6) !important;
+    backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 18px 18px 18px 0 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
 /* ─── Input Row ─── */
 .input-row {
     animation: fadeIn 0.5s ease-out 0.3s both;
@@ -337,6 +358,21 @@ footer { display: none !important; }
 
 .send-btn:active {
     transform: translateY(0) !important;
+}
+
+/* ─── Tools Row Buttons ─── */
+.tools-row button {
+    background: transparent !important;
+    border: 1px solid rgba(99, 102, 241, 0.2) !important;
+    color: #818cf8 !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease;
+}
+
+.tools-row button:hover {
+    background: rgba(99, 102, 241, 0.1) !important;
+    border-color: rgba(99, 102, 241, 0.4) !important;
+    color: #a5b4fc !important;
 }
 
 /* ─── Quick Questions ─── */
