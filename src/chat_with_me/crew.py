@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
@@ -14,7 +15,12 @@ class ChatWithMe():
     tasks: list[Task]
 
     text_source = TextFileKnowledgeSource(
-        file_paths=["about_me.md", "resume.md", "faq.yaml", "projects.md"],
+        file_paths=[
+            "about_me.md",
+            "resume.md",
+            "faq.yaml",
+            "projects.md"
+        ],
         chunk_size=1000,
         chunk_overlap=200
     )
@@ -45,6 +51,6 @@ class ChatWithMe():
             process=Process.sequential,
             verbose=True,
             memory=False,
-            embedder={"provider": "google", "config": {"model": "models/embedding-001", "api_key": os.environ.get('GOOGLE_API_KEY')}},
+            embedder={"provider": "google-generativeai", "config": {"model": "models/embedding-001", "api_key": os.environ.get('GOOGLE_API_KEY')}},
             knowledge_sources=[self.text_source]
         )
