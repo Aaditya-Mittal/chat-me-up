@@ -10,20 +10,45 @@ import datetime
 import tempfile
 import threading
 import time
+import yaml
+from pathlib import Path
 from google import genai
+from dotenv import load_dotenv
 
 import gradio as gr
-
-from chat_with_me.crew import ChatWithMe
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-# Initialize the crew once at startup
-print("Initializing ChatWithMe crew...")
-crew_instance = ChatWithMe().crew()
-crew_lock = threading.Lock()
-print("Crew ready!")
+load_dotenv()
+
+# Initialize Google GenAI client and load context once at startup
+print("Initializing Gemini API and Knowledge Base...")
+genai_client = genai.Client(api_key=os.environ.get('GOOGLE_API_KEY'))
+
+def build_system_instruction():
+    base_dir = Path(__file__).resolve().parent.parent.parent
+    agents_path = base_dir / "src" / "chat_with_me" / "config" / "agents.yaml"
+    knowledge_dir = base_dir / "knowledge"
+    
+    with open(agents_path, 'r', encoding='utf-8') as f:
+        agents = yaml.safe_load(f)
+        
+    persona_data = agents.get('persona_agent', {})
+    persona_text = f"Role: {persona_data.get('role', '')}\nGoal: {persona_data.get('goal', '')}\nBackstory: {persona_data.get('backstory', '')}"
+    
+    knowledge_texts = []
+    for ext in ['*.md', '*.yaml', '*.txt']:
+        for file_path in knowledge_dir.glob(ext):
+            with open(file_path, 'r', encoding='utf-8') as f:
+                knowledge_texts.append(f"--- FILE: {file_path.name} ---\n{f.read()}\n")
+                
+    knowledge_base = "\n".join(knowledge_texts)
+    
+    return f"{persona_text}\n\n======================\nKNOWLEDGE BASE (USE THIS TO ANSWER):\n======================\n{knowledge_base}"
+
+system_instruction = build_system_instruction()
+print("System instruction ready!")
 
 
 # --- Helper functions ---
@@ -82,7 +107,7 @@ def user_message(text_msg, audio_path, history):
 
 
 def bot_response(history):
-    """Generate bot response using the CrewAI crew."""
+    """Generate bot response using direct Gemini streaming."""
     if not history:
         yield history
         return
@@ -90,40 +115,43 @@ def bot_response(history):
     user_msg = history[-1]["content"]
     prior = history[:-1]
     
-    # Append a thinking state
+    # Initialize the assistant's response bubble
     history = history + [{"role": "assistant", "content": "🤔 *Thinking...*"}]
     yield history
-
-    history_text = format_history(prior)
     
     # Inject current date context
     now = datetime.datetime.now()
     date_str = now.strftime("%B %d, %Y")
-    system_context = f"[System Context: The current date is {date_str}. Keep this timeline in mind.]"
-
-    if history_text:
-        full_message = (
-            f"{system_context}\n\n"
-            f"Previous conversation:\n{history_text}\n\n"
-            f"New message from visitor: {user_msg}"
-        )
-    else:
-        full_message = f"{system_context}\n\nNew message from visitor: {user_msg}"
+    
+    # Build Gemini history format
+    gemini_history = []
+    for msg in prior:
+        role = "user" if msg["role"] == "user" else "model"
+        gemini_history.append({"role": role, "parts": [{"text": msg["content"]}]})
+        
+    gemini_history.append({"role": "user", "parts": [{"text": f"[System Context: Today is {date_str}.] " + user_msg}]})
 
     try:
-        with crew_lock:
-            result = crew_instance.kickoff(inputs={"user_message": full_message})
-        reply = result.raw
+        response = genai_client.models.generate_content_stream(
+            model='gemini-2.5-flash',
+            contents=gemini_history,
+            config={"system_instruction": system_instruction}
+        )
+        
+        # Clear the thinking indicator on first chunk
+        first_chunk = True
+        
+        for chunk in response:
+            if chunk.text:
+                if first_chunk:
+                    history[-1]["content"] = ""
+                    first_chunk = False
+                history[-1]["content"] += chunk.text
+                yield history
+                
     except Exception as e:
-        reply = f"Hmm, something went wrong on my end. Mind trying again? (Error: {str(e)[:120]})"
-
-    # Replace the thinking state with the actual reply smoothly
-    history[-1]["content"] = ""
-    words = reply.split(' ')
-    for i, word in enumerate(words):
-        history[-1]["content"] += word + (" " if i < len(words) - 1 else "")
+        history[-1]["content"] = f"Hmm, something went wrong on my end. Mind trying again? (Error: {str(e)[:120]})"
         yield history
-        time.sleep(0.03)  # subtle typing delay
 
 
 def export_chat(history):
@@ -582,7 +610,7 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
                     🐙 GitHub
                 </a>
             </div>
-            <div class="footer-credit">Built with CrewAI + Gemini · RAG-powered</div>
+            <div class="footer-credit">Powered by Gemini 2.5 Flash · Real-time RAG</div>
         </div>
     """)
 
