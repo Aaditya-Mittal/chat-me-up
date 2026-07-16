@@ -102,7 +102,8 @@ def user_message(text_msg, audio_path, history):
     # Security: Limit input length to prevent token exhaustion or buffer overflow attempts
     message = message.strip()[:1000]
         
-    history = history + [{"role": "user", "content": message}]
+    # Default to tuples format since type='messages' isn't supported in this Gradio version
+    history = history + [[message, None]]
     return "", None, history
 
 
@@ -111,12 +112,26 @@ def bot_response(history):
     if not history:
         yield history
         return
+        
+    def get_text(content):
+        if isinstance(content, str):
+            return content
+        elif isinstance(content, list):
+            # Gradio multimodal list of dicts or tuples
+            return " ".join([get_text(c) for c in content])
+        elif isinstance(content, dict) and "text" in content:
+            return content["text"]
+        elif isinstance(content, tuple):
+            return get_text(content[0]) if content else ""
+        return str(content)
 
-    user_msg = history[-1]["content"]
+    user_msg_tuple = history[-1]
+    user_msg = get_text(user_msg_tuple[0])
+
     prior = history[:-1]
     
     # Initialize the assistant's response bubble
-    history = history + [{"role": "assistant", "content": "🤔 *Thinking...*"}]
+    history[-1][1] = "🤔 *Thinking...*"
     yield history
     
     # Inject current date context
@@ -126,8 +141,12 @@ def bot_response(history):
     # Build Gemini history format
     gemini_history = []
     for msg in prior:
-        role = "user" if msg["role"] == "user" else "model"
-        gemini_history.append({"role": role, "parts": [{"text": msg["content"]}]})
+        user_content = get_text(msg[0]) if len(msg) > 0 and msg[0] else ""
+        bot_content = get_text(msg[1]) if len(msg) > 1 and msg[1] else ""
+        if user_content:
+            gemini_history.append({"role": "user", "parts": [{"text": user_content}]})
+        if bot_content:
+            gemini_history.append({"role": "model", "parts": [{"text": bot_content}]})
         
     gemini_history.append({"role": "user", "parts": [{"text": f"[System Context: Today is {date_str}.] " + user_msg}]})
 
@@ -144,13 +163,13 @@ def bot_response(history):
         for chunk in response:
             if chunk.text:
                 if first_chunk:
-                    history[-1]["content"] = ""
+                    history[-1][1] = ""
                     first_chunk = False
-                history[-1]["content"] += chunk.text
+                history[-1][1] += chunk.text
                 yield history
                 
     except Exception as e:
-        history[-1]["content"] = f"Hmm, something went wrong on my end. Mind trying again? (Error: {str(e)[:120]})"
+        history[-1][1] = f"Hmm, something went wrong on my end. Mind trying again? (Error: {str(e)[:120]})"
         yield history
 
 
