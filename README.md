@@ -2,7 +2,7 @@
 
 # 💬 Chat Me Up
 
-**An AI-powered portfolio chatbot that represents me in my own voice.**
+**An AI-powered portfolio chatbot that represents me in my own voice. Customize it to create your own chat-bot for your portfolio.**
 
 Built with [CrewAI](https://crewai.com) · Powered by [Gemini](https://deepmind.google/technologies/gemini/) · Served via [Gradio](https://gradio.app)
 
