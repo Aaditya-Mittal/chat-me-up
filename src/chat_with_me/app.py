@@ -13,6 +13,7 @@ import time
 import yaml
 from pathlib import Path
 from google import genai
+from google.genai import types as genai_types
 from dotenv import load_dotenv
 
 import gradio as gr
@@ -69,22 +70,26 @@ def format_history(history: list[dict]) -> str:
 def transcribe_audio(audio_path):
     if not audio_path:
         return ""
-    api_key = os.environ.get('GOOGLE_API_KEY')
-    if not api_key:
+    if not os.environ.get('GOOGLE_API_KEY'):
         print("Transcription error: GOOGLE_API_KEY is not set.")
         return "I'm sorry, voice input is currently unavailable due to missing API configuration."
-        
+
     try:
-        client = genai.Client(api_key=api_key)
-        audio_file = client.files.upload(file=audio_path)
-        response = client.models.generate_content(
-            model='gemini-1.5-flash',
+        # Send audio bytes inline — avoids the slow Files API upload round-trip
+        suffix = Path(audio_path).suffix.lower().lstrip('.') or 'wav'
+        mime_type = f"audio/{'mpeg' if suffix == 'mp3' else suffix}"
+        audio_bytes = Path(audio_path).read_bytes()
+        response = genai_client.models.generate_content(
+            model='gemini-2.5-flash',
             contents=[
                 "Transcribe this audio exactly as spoken. Only return the transcribed text, nothing else.",
-                audio_file
+                genai_types.Part.from_bytes(data=audio_bytes, mime_type=mime_type),
             ]
         )
-        return response.text.strip()
+        text = (response.text or "").strip()
+        if not text:
+            return "I couldn't quite hear that clearly. Could you try typing it?"
+        return text
     except Exception as e:
         print(f"Transcription error: {e}")
         return "I couldn't quite hear that clearly. Could you try typing it?"
@@ -92,27 +97,28 @@ def transcribe_audio(audio_path):
 
 def user_message(text_msg, audio_path, history):
     """Append user message (or transcribed audio) to history and clear input."""
+    # Prefer typed text; only fall back to audio when the textbox is empty
     message = text_msg
-    if audio_path:
+    if not (message and message.strip()) and audio_path:
         message = transcribe_audio(audio_path)
-        
+
     if not message or not message.strip():
         return "", None, history
-        
+
     # Security: Limit input length to prevent token exhaustion or buffer overflow attempts
     message = message.strip()[:1000]
-        
-    # Default to tuples format since type='messages' isn't supported in this Gradio version
-    history = history + [[message, None]]
+
+    # Gradio 6 Chatbot uses messages format (role/content dicts)
+    history = history + [{"role": "user", "content": message}]
     return "", None, history
 
 
 def bot_response(history):
     """Generate bot response using direct Gemini streaming."""
-    if not history:
+    if not history or history[-1]["role"] != "user":
         yield history
         return
-        
+
     def get_text(content):
         if isinstance(content, str):
             return content
@@ -125,51 +131,63 @@ def bot_response(history):
             return get_text(content[0]) if content else ""
         return str(content)
 
-    user_msg_tuple = history[-1]
-    user_msg = get_text(user_msg_tuple[0])
-
+    user_msg = get_text(history[-1]["content"])
     prior = history[:-1]
-    
+
     # Initialize the assistant's response bubble
-    history[-1][1] = "🤔 *Thinking...*"
+    history = history + [{"role": "assistant", "content": "🤔 *Thinking...*"}]
     yield history
-    
+
     # Inject current date context
     now = datetime.datetime.now()
     date_str = now.strftime("%B %d, %Y")
-    
-    # Build Gemini history format
+
+    # Build Gemini history format (cap to the most recent turns to bound latency/cost)
+    MAX_HISTORY_MESSAGES = 40  # ~20 user/assistant exchanges
     gemini_history = []
-    for msg in prior:
-        user_content = get_text(msg[0]) if len(msg) > 0 and msg[0] else ""
-        bot_content = get_text(msg[1]) if len(msg) > 1 and msg[1] else ""
-        if user_content:
-            gemini_history.append({"role": "user", "parts": [{"text": user_content}]})
-        if bot_content:
-            gemini_history.append({"role": "model", "parts": [{"text": bot_content}]})
-        
+    for msg in prior[-MAX_HISTORY_MESSAGES:]:
+        content = get_text(msg["content"])
+        if not content:
+            continue
+        role = "user" if msg["role"] == "user" else "model"
+        gemini_history.append({"role": role, "parts": [{"text": content}]})
+
     gemini_history.append({"role": "user", "parts": [{"text": f"[System Context: Today is {date_str}.] " + user_msg}]})
 
     try:
         response = genai_client.models.generate_content_stream(
             model='gemini-2.5-flash',
             contents=gemini_history,
-            config={"system_instruction": system_instruction}
+            config={
+                "system_instruction": system_instruction,
+                # Persona chat doesn't need reasoning; disabling thinking cuts
+                # time-to-first-token dramatically
+                "thinking_config": {"thinking_budget": 0},
+            }
         )
-        
+
         # Clear the thinking indicator on first chunk
         first_chunk = True
-        
+        # Throttle UI updates: yield at most ~every 50ms instead of per chunk
+        last_yield = time.monotonic()
+
         for chunk in response:
             if chunk.text:
                 if first_chunk:
-                    history[-1][1] = ""
+                    history[-1]["content"] = ""
                     first_chunk = False
-                history[-1][1] += chunk.text
-                yield history
-                
+                history[-1]["content"] += chunk.text
+                now_t = time.monotonic()
+                if now_t - last_yield >= 0.05:
+                    last_yield = now_t
+                    yield history
+
+        # Ensure the final accumulated text is always rendered
+        yield history
+
     except Exception as e:
-        history[-1][1] = f"Hmm, something went wrong on my end. Mind trying again? (Error: {str(e)[:120]})"
+        print(f"Generation error: {e}")
+        history[-1]["content"] = "Hmm, something went wrong on my end. Mind trying again in a moment?"
         yield history
 
 
@@ -182,9 +200,12 @@ def export_chat(history):
 
 
 def undo_last(history):
-    if len(history) >= 2:
-        return history[:-2]
-    return []
+    """Remove the last user message and any assistant reply that followed it."""
+    while history and history[-1]["role"] == "assistant":
+        history = history[:-1]
+    if history and history[-1]["role"] == "user":
+        history = history[:-1]
+    return history
 
 
 # --- Theme ---
@@ -348,15 +369,17 @@ footer { display: none !important; }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Premium Chat Bubbles ─── */
-.chat-wrap .message-wrap .message.user {
+/* ─── Premium Chat Bubbles (Gradio 6 DOM: .user-row/.bot-row rows, .user/.bot messages) ─── */
+.chat-wrap .message.user,
+.chat-wrap .user-row .message {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(167, 139, 250, 0.15)) !important;
     border: 1px solid rgba(167, 139, 250, 0.3) !important;
     border-radius: 18px 18px 0 18px !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
 }
 
-.chat-wrap .message-wrap .message.bot {
+.chat-wrap .message.bot,
+.chat-wrap .bot-row .message {
     background: rgba(30, 33, 54, 0.6) !important;
     backdrop-filter: blur(8px) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
@@ -407,6 +430,19 @@ footer { display: none !important; }
     transform: translateY(0) !important;
 }
 
+/* ─── Voice Accordion ─── */
+.voice-accordion {
+    background: rgba(15, 17, 30, 0.6) !important;
+    border: 1px solid rgba(99, 102, 241, 0.1) !important;
+    border-radius: 12px !important;
+    margin-top: 0.5rem !important;
+}
+
+.voice-accordion .label-wrap {
+    color: #818cf8 !important;
+    font-size: 0.82rem !important;
+}
+
 /* ─── Tools Row Buttons ─── */
 .tools-row button {
     background: transparent !important;
@@ -438,23 +474,26 @@ footer { display: none !important; }
     margin-bottom: 0.6rem;
 }
 
+/* Force a 2-column grid on the Gradio Row (which is flex by default) */
 .quick-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
 }
 
 .quick-card {
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid rgba(99, 102, 241, 0.1);
-    background: rgba(15, 17, 30, 0.6);
-    color: #94a3b8;
-    font-size: 0.8rem;
-    line-height: 1.4;
-    cursor: pointer;
-    text-align: left;
-    font-weight: 400;
+    width: 100% !important;
+    padding: 10px 14px !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(99, 102, 241, 0.1) !important;
+    background: rgba(15, 17, 30, 0.6) !important;
+    color: #94a3b8 !important;
+    font-size: 0.8rem !important;
+    line-height: 1.4 !important;
+    cursor: pointer !important;
+    text-align: left !important;
+    font-weight: 400 !important;
+    justify-content: flex-start !important;
 }
 
 .quick-card:hover {
@@ -579,24 +618,25 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
             container=False,
             autofocus=True,
         )
-        audio = gr.Audio(
-            sources=["microphone"], 
-            type="filepath", 
-            scale=1, 
-            show_label=False, 
-            container=False,
-            min_width=60,
-            waveform_options=gr.WaveformOptions(
-                waveform_color="#6366f1",
-                waveform_progress_color="#818cf8",
-            )
-        )
         send_btn = gr.Button(
             "Send",
             variant="primary",
             scale=1,
             min_width=80,
             elem_classes=["send-btn"],
+        )
+
+    # Voice input in its own collapsible section — a full waveform widget doesn't
+    # fit cleanly inside the input row
+    with gr.Accordion("🎙️ Voice input", open=False, elem_classes=["voice-accordion"]):
+        audio = gr.Audio(
+            sources=["microphone"],
+            type="filepath",
+            show_label=False,
+            waveform_options=gr.WaveformOptions(
+                waveform_color="#6366f1",
+                waveform_progress_color="#818cf8",
+            )
         )
 
     with gr.Row(elem_classes=["tools-row"]):
@@ -613,7 +653,13 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
     with gr.Row(elem_classes=["quick-grid"]):
         for q in QUICK_QUESTIONS:
             btn = gr.Button(f"{q['icon']} {q['text']}", elem_classes=["quick-card"])
-            btn.click(lambda text=q['text']: text, inputs=None, outputs=[msg])
+            # Clicking a suggestion sends it immediately instead of just filling the box
+            btn.click(
+                lambda history, text=q['text']: user_message(text, None, history),
+                inputs=[chatbot],
+                outputs=[msg, audio, chatbot],
+                queue=False,
+            ).then(bot_response, chatbot, chatbot)
 
     # Footer
     gr.HTML("""
@@ -633,11 +679,11 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
         </div>
     """)
 
-    # Event wiring
-    msg.submit(user_message, [msg, audio, chatbot], [msg, audio, chatbot], queue=False).then(
+    # Event wiring (send events use the queue: audio transcription can take seconds)
+    msg.submit(user_message, [msg, audio, chatbot], [msg, audio, chatbot]).then(
         bot_response, chatbot, chatbot
     )
-    send_btn.click(user_message, [msg, audio, chatbot], [msg, audio, chatbot], queue=False).then(
+    send_btn.click(user_message, [msg, audio, chatbot], [msg, audio, chatbot]).then(
         bot_response, chatbot, chatbot
     )
     clear_btn.click(lambda: [], None, chatbot, queue=False)
