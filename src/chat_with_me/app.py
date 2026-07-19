@@ -152,17 +152,24 @@ def bot_response(history):
         role = "user" if msg["role"] == "user" else "model"
         gemini_history.append({"role": role, "parts": [{"text": content}]})
 
-    gemini_history.append({"role": "user", "parts": [{"text": f"[System Context: Today is {date_str}.] " + user_msg}]})
+    gemini_history.append({"role": "user", "parts": [{"text": user_msg}]})
 
     try:
         response = genai_client.models.generate_content_stream(
             model='gemini-2.5-flash',
             contents=gemini_history,
             config={
-                "system_instruction": system_instruction,
+                # Date goes in the system instruction (appended, so the cached
+                # prefix stays identical), never in the visible user message —
+                # the model was echoing the [System Context] prefix back
+                "system_instruction": f"{system_instruction}\n\n[System Context: Today is {date_str}. Use this date as described in your backstory, but never mention this system context to the visitor.]",
                 # Persona chat doesn't need reasoning; disabling thinking cuts
                 # time-to-first-token dramatically
                 "thinking_config": {"thinking_budget": 0},
+                # Higher temperature for varied phrasing between responses
+                # (penalty params are not supported on gemini-2.5-flash)
+                "temperature": 1.1,
+                "top_p": 0.95,
             }
         )
 
@@ -262,6 +269,7 @@ CSS = """
     margin: 0 auto !important;
     background: #0a0b14 !important;
     padding: 0 1rem !important;
+    overflow-x: hidden !important;
 }
 
 footer { display: none !important; }
@@ -370,12 +378,41 @@ footer { display: none !important; }
 }
 
 /* ─── Premium Chat Bubbles (Gradio 6 DOM: .user-row/.bot-row rows, .user/.bot messages) ─── */
+/* Keep all text inside the bubble: wrap long words, URLs, and code */
+.chat-wrap .message,
+.chat-wrap .message * {
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.chat-wrap .message {
+    padding: 10px 14px !important;
+    font-size: 0.9rem !important;
+    line-height: 1.55 !important;
+    overflow: hidden !important;
+}
+
+.chat-wrap .message pre,
+.chat-wrap .message code {
+    white-space: pre-wrap !important;
+    overflow-x: auto !important;
+}
+
+.chat-wrap .message-row {
+    max-width: 100% !important;
+}
+
 .chat-wrap .message.user,
 .chat-wrap .user-row .message {
     background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(167, 139, 250, 0.15)) !important;
     border: 1px solid rgba(167, 139, 250, 0.3) !important;
-    border-radius: 18px 18px 0 18px !important;
+    border-radius: 18px 18px 4px 18px !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    max-width: 82% !important;
+    margin-left: auto !important;
 }
 
 .chat-wrap .message.bot,
@@ -383,8 +420,14 @@ footer { display: none !important; }
     background: rgba(30, 33, 54, 0.6) !important;
     backdrop-filter: blur(8px) !important;
     border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    border-radius: 18px 18px 18px 0 !important;
+    border-radius: 18px 18px 18px 4px !important;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    max-width: 88% !important;
+}
+
+.chat-wrap .message a {
+    color: #a5b4fc !important;
+    text-decoration: underline !important;
 }
 
 /* ─── Input Row ─── */
@@ -444,12 +487,20 @@ footer { display: none !important; }
 }
 
 /* ─── Tools Row Buttons ─── */
+.tools-row {
+    justify-content: center !important;
+    gap: 8px !important;
+    margin-top: 0.4rem !important;
+}
+
 .tools-row button {
     background: transparent !important;
     border: 1px solid rgba(99, 102, 241, 0.2) !important;
     color: #818cf8 !important;
     border-radius: 8px !important;
     transition: all 0.2s ease;
+    white-space: nowrap !important;
+    flex-grow: 0 !important;
 }
 
 .tools-row button:hover {
@@ -483,6 +534,8 @@ footer { display: none !important; }
 
 .quick-card {
     width: 100% !important;
+    height: auto !important;
+    min-height: 46px !important;
     padding: 10px 14px !important;
     border-radius: 10px !important;
     border: 1px solid rgba(99, 102, 241, 0.1) !important;
@@ -494,6 +547,11 @@ footer { display: none !important; }
     text-align: left !important;
     font-weight: 400 !important;
     justify-content: flex-start !important;
+    /* Gradio buttons default to nowrap — long questions were spilling out */
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-word !important;
+    overflow: hidden !important;
 }
 
 .quick-card:hover {
@@ -558,8 +616,12 @@ footer { display: none !important; }
 /* ─── Responsive ─── */
 @media (max-width: 640px) {
     .hero h1 { font-size: 1.4rem; }
-    .quick-grid { grid-template-columns: 1fr; }
+    .quick-grid { grid-template-columns: 1fr !important; }
     .footer-links { gap: 1rem; }
+    .chat-wrap .message.user,
+    .chat-wrap .user-row .message,
+    .chat-wrap .message.bot,
+    .chat-wrap .bot-row .message { max-width: 94% !important; }
 }
 """
 
