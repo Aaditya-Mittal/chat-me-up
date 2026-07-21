@@ -31,21 +31,21 @@ def build_system_instruction():
     base_dir = Path(__file__).resolve().parent.parent.parent
     agents_path = base_dir / "src" / "chat_with_me" / "config" / "agents.yaml"
     knowledge_dir = base_dir / "knowledge"
-    
+
     with open(agents_path, 'r', encoding='utf-8') as f:
         agents = yaml.safe_load(f)
-        
+
     persona_data = agents.get('persona_agent', {})
     persona_text = f"Role: {persona_data.get('role', '')}\nGoal: {persona_data.get('goal', '')}\nBackstory: {persona_data.get('backstory', '')}"
-    
+
     knowledge_texts = []
     for ext in ['*.md', '*.yaml', '*.txt']:
         for file_path in knowledge_dir.glob(ext):
             with open(file_path, 'r', encoding='utf-8') as f:
                 knowledge_texts.append(f"--- FILE: {file_path.name} ---\n{f.read()}\n")
-                
+
     knowledge_base = "\n".join(knowledge_texts)
-    
+
     return f"{persona_text}\n\n======================\nKNOWLEDGE BASE (USE THIS TO ANSWER):\n======================\n{knowledge_base}"
 
 system_instruction = build_system_instruction()
@@ -215,44 +215,44 @@ def undo_last(history):
     return history
 
 
-# --- Theme ---
+# --- Theme: "Emerald Noir" — green-tinted black, emerald primaries, mint accents ---
 
 theme = gr.themes.Soft(
-    primary_hue=gr.themes.colors.indigo,
-    secondary_hue=gr.themes.colors.violet,
+    primary_hue=gr.themes.colors.emerald,
+    secondary_hue=gr.themes.colors.teal,
     neutral_hue=gr.themes.colors.slate,
     font=(gr.themes.GoogleFont("Inter"), "system-ui", "-apple-system", "sans-serif"),
     font_mono=(gr.themes.GoogleFont("JetBrains Mono"), "Fira Code", "monospace"),
 ).set(
-    body_background_fill="#05060c",
-    body_background_fill_dark="#05060c",
-    body_text_color="#d3d9e6",
-    body_text_color_dark="#d3d9e6",
+    body_background_fill="#040807",
+    body_background_fill_dark="#040807",
+    body_text_color="#e2ece8",
+    body_text_color_dark="#e2ece8",
 
-    block_background_fill="rgba(13, 15, 28, 0.55)",
-    block_background_fill_dark="rgba(13, 15, 28, 0.55)",
-    block_border_color="rgba(129, 140, 248, 0.10)",
-    block_border_color_dark="rgba(129, 140, 248, 0.10)",
-    block_label_text_color="#818cf8",
-    block_label_text_color_dark="#818cf8",
+    block_background_fill="rgba(13, 23, 20, 0.55)",
+    block_background_fill_dark="rgba(13, 23, 20, 0.55)",
+    block_border_color="rgba(52, 211, 153, 0.10)",
+    block_border_color_dark="rgba(52, 211, 153, 0.10)",
+    block_label_text_color="#34d399",
+    block_label_text_color_dark="#34d399",
     block_shadow="none",
     block_shadow_dark="none",
 
-    button_primary_background_fill="linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-    button_primary_background_fill_dark="linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-    button_primary_text_color="#ffffff",
-    button_primary_text_color_dark="#ffffff",
-    button_primary_background_fill_hover="linear-gradient(135deg, #818cf8 0%, #a78bfa 100%)",
-    button_primary_background_fill_hover_dark="linear-gradient(135deg, #818cf8 0%, #a78bfa 100%)",
+    button_primary_background_fill="linear-gradient(135deg, #10b981 0%, #059669 100%)",
+    button_primary_background_fill_dark="linear-gradient(135deg, #10b981 0%, #059669 100%)",
+    button_primary_text_color="#04110c",
+    button_primary_text_color_dark="#04110c",
+    button_primary_background_fill_hover="linear-gradient(135deg, #34d399 0%, #10b981 100%)",
+    button_primary_background_fill_hover_dark="linear-gradient(135deg, #34d399 0%, #10b981 100%)",
 
-    input_background_fill="rgba(13, 15, 28, 0.9)",
-    input_background_fill_dark="rgba(13, 15, 28, 0.9)",
-    input_border_color="rgba(129, 140, 248, 0.16)",
-    input_border_color_dark="rgba(129, 140, 248, 0.16)",
-    input_border_color_focus="rgba(129, 140, 248, 0.45)",
-    input_border_color_focus_dark="rgba(129, 140, 248, 0.45)",
-    input_placeholder_color="#3d4364",
-    input_placeholder_color_dark="#3d4364",
+    input_background_fill="rgba(13, 23, 20, 0.9)",
+    input_background_fill_dark="rgba(13, 23, 20, 0.9)",
+    input_border_color="rgba(52, 211, 153, 0.16)",
+    input_border_color_dark="rgba(52, 211, 153, 0.16)",
+    input_border_color_focus="rgba(52, 211, 153, 0.45)",
+    input_border_color_focus_dark="rgba(52, 211, 153, 0.45)",
+    input_placeholder_color="#3d4f47",
+    input_placeholder_color_dark="#3d4f47",
 )
 
 
@@ -261,13 +261,32 @@ theme = gr.themes.Soft(
 CSS = """
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@600;700;800&display=swap');
 
+/* ─── Design tokens: Emerald Noir ─── */
+:root {
+    --bg: #040807;
+    --panel: rgba(13, 23, 20, 0.60);
+    --panel-heavy: rgba(10, 18, 15, 0.75);
+    --border: rgba(52, 211, 153, 0.12);
+    --border-strong: rgba(52, 211, 153, 0.40);
+    --primary: #10b981;
+    --primary-deep: #059669;
+    --accent: #6ee7b7;
+    --text: #e2ece8;
+    --text-bright: #f2f8f5;
+    --muted: #7f948c;
+    --faint: #46564f;
+    /* Vertical space reserved for everything that isn't the chat panel.
+       The chatbot's inline height is calc(100dvh - var(--chat-offset)). */
+    --chat-offset: 460px;
+}
+
 /* ─── Reset & Base ─── */
 * { transition: background-color 0.3s ease, border-color 0.3s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.3s ease, opacity 0.3s ease; }
 
-::selection { background: rgba(139, 92, 246, 0.35); color: #f1f5f9; }
+::selection { background: rgba(16, 185, 129, 0.35); color: var(--text-bright); }
 
 body {
-    background: #05060c !important;
+    background: var(--bg) !important;
 }
 
 /* Ambient aurora glow layer behind everything */
@@ -278,16 +297,16 @@ body::before {
     pointer-events: none;
     z-index: 0;
     background:
-        radial-gradient(ellipse 60% 40% at 20% -5%, rgba(99, 102, 241, 0.16), transparent 60%),
-        radial-gradient(ellipse 50% 35% at 85% 0%, rgba(139, 92, 246, 0.13), transparent 60%),
-        radial-gradient(ellipse 45% 30% at 50% 110%, rgba(67, 56, 202, 0.10), transparent 65%);
+        radial-gradient(ellipse 60% 40% at 20% -5%, rgba(16, 185, 129, 0.14), transparent 60%),
+        radial-gradient(ellipse 50% 35% at 85% 0%, rgba(45, 212, 191, 0.10), transparent 60%),
+        radial-gradient(ellipse 45% 30% at 50% 110%, rgba(5, 150, 105, 0.10), transparent 65%);
 }
 
 .gradio-container {
-    max-width: 780px !important;
+    max-width: 840px !important;
     margin: 0 auto !important;
     background: transparent !important;
-    padding: 0 1.25rem 2rem !important;
+    padding: 0 1.25rem 0.75rem !important;
     overflow-x: hidden !important;
     position: relative;
     z-index: 1;
@@ -295,10 +314,10 @@ body::before {
 
 footer { display: none !important; }
 
-/* ─── Hero Header ─── */
+/* ─── Hero Header (compact — the shell must fit in one viewport) ─── */
 .hero {
     text-align: center;
-    padding: 2.5rem 0 1.5rem;
+    padding: 1.4rem 0 0.9rem;
     animation: fadeInDown 0.6s ease-out;
 }
 
@@ -308,15 +327,15 @@ footer { display: none !important; }
 }
 
 .hero-avatar-ring {
-    width: 88px; height: 88px;
+    width: 64px; height: 64px;
     border-radius: 50%;
     padding: 3px;
-    background: conic-gradient(from 180deg, #6366f1, #a78bfa, #22d3ee, #6366f1);
+    background: conic-gradient(from 180deg, #10b981, #6ee7b7, #2dd4bf, #10b981);
     animation: ringSpin 6s linear infinite;
-    margin: 0 auto 1.1rem;
+    margin: 0 auto 0.8rem;
     display: block;
     position: relative;
-    box-shadow: 0 0 42px rgba(124, 108, 245, 0.45), 0 0 90px rgba(139, 92, 246, 0.18);
+    box-shadow: 0 0 36px rgba(16, 185, 129, 0.40), 0 0 80px rgba(45, 212, 191, 0.15);
 }
 
 @keyframes ringSpin {
@@ -326,18 +345,18 @@ footer { display: none !important; }
 .hero-avatar-ring img {
     width: 100%; height: 100%;
     border-radius: 50%;
-    border: 3px solid #05060c;
+    border: 3px solid var(--bg);
     display: block;
     animation: ringSpin 6s linear infinite reverse; /* keep face upright */
 }
 
 .hero h1 {
     font-family: 'Sora', 'Inter', sans-serif;
-    font-size: 2rem;
+    font-size: 1.7rem;
     font-weight: 700;
-    margin: 0 0 0.4rem;
+    margin: 0 0 0.3rem;
     letter-spacing: -0.035em;
-    background: linear-gradient(120deg, #f1f5f9 20%, #a5b4fc 55%, #c4b5fd 80%);
+    background: linear-gradient(120deg, #f2f8f5 20%, #6ee7b7 55%, #5eead4 80%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -345,25 +364,25 @@ footer { display: none !important; }
 }
 
 .hero p {
-    color: #5b6478;
-    font-size: 0.9rem;
+    color: var(--muted);
+    font-size: 0.86rem;
     margin: 0;
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 .status-badge {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    margin-top: 0.85rem;
-    padding: 5px 14px;
+    margin-top: 0.6rem;
+    padding: 4px 13px;
     border-radius: 20px;
-    background: rgba(34, 197, 94, 0.07);
-    border: 1px solid rgba(34, 197, 94, 0.18);
+    background: rgba(52, 211, 153, 0.07);
+    border: 1px solid rgba(52, 211, 153, 0.20);
     backdrop-filter: blur(6px);
-    font-size: 0.72rem;
-    color: #4ade80;
+    font-size: 0.7rem;
+    color: #34d399;
     font-weight: 500;
     letter-spacing: 0.04em;
 }
@@ -371,18 +390,20 @@ footer { display: none !important; }
 .status-dot {
     width: 6px; height: 6px;
     border-radius: 50%;
-    background: #4ade80;
+    background: #34d399;
     animation: softPulse 2.5s ease-in-out infinite;
 }
 
 @keyframes softPulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.3); }
-    50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(74, 222, 128, 0); }
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.3); }
+    50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(52, 211, 153, 0); }
 }
 
 /* ─── Chatbot ─── */
 .chat-wrap {
     animation: fadeIn 0.5s ease-out 0.2s both;
+    /* Guard for tiny viewports — the page scrolls instead of crushing the chat */
+    min-height: 300px !important;
 }
 
 @keyframes fadeIn {
@@ -392,10 +413,10 @@ footer { display: none !important; }
 
 /* Glass panel around the conversation */
 .chat-wrap {
-    background: rgba(11, 13, 26, 0.55) !important;
+    background: var(--panel) !important;
     backdrop-filter: blur(14px) !important;
     -webkit-backdrop-filter: blur(14px) !important;
-    border: 1px solid rgba(129, 140, 248, 0.12) !important;
+    border: 1px solid var(--border) !important;
     border-radius: 20px !important;
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
     padding: 6px !important;
@@ -447,10 +468,10 @@ footer { display: none !important; }
 
 .chat-wrap .message.user,
 .chat-wrap .user-row .message {
-    background: linear-gradient(135deg, #5458e8 0%, #7c4deb 100%) !important;
+    background: linear-gradient(135deg, #0ea371 0%, #047857 100%) !important;
     border: none !important;
     border-radius: 18px 18px 5px 18px !important;
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.32) !important;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.28) !important;
     max-width: 82% !important;
     margin-left: auto !important;
 }
@@ -464,33 +485,81 @@ footer { display: none !important; }
 
 .chat-wrap .message.bot,
 .chat-wrap .bot-row .message {
-    background: rgba(32, 36, 60, 0.55) !important;
+    background: rgba(23, 37, 32, 0.55) !important;
     backdrop-filter: blur(10px) !important;
     border: 1px solid rgba(255, 255, 255, 0.06) !important;
     border-radius: 18px 18px 18px 5px !important;
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
     max-width: 88% !important;
-    color: #d3d9e6 !important;
+    color: var(--text) !important;
 }
 
 .chat-wrap .message a {
-    color: #a5b4fc !important;
+    color: var(--accent) !important;
     text-decoration: underline !important;
     text-underline-offset: 2px;
 }
 
 /* Placeholder text before first message */
 .chat-wrap .placeholder-content, .chat-wrap .placeholder {
-    color: #4a5170 !important;
+    color: var(--faint) !important;
+}
+
+/* Hide any stray component labels inside the chat panel */
+.chat-wrap .label-wrap, .chat-wrap > label, .chat-wrap span[data-testid="block-info"] {
+    display: none !important;
+}
+
+/* ─── Quick Question Chips (horizontal scroll strip) ─── */
+.quick-strip {
+    animation: fadeIn 0.5s ease-out 0.3s both;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 8px !important;
+    margin-top: 0.6rem !important;
+    padding: 2px 2px 6px !important;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+    /* fade hint that the strip scrolls */
+    mask-image: linear-gradient(to right, black 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 92%, transparent 100%);
+}
+
+.quick-strip button {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: fit-content !important;
+    height: auto !important;
+    border-radius: 999px !important;
+    border: 1px solid var(--border) !important;
+    background: var(--panel) !important;
+    backdrop-filter: blur(10px) !important;
+    color: var(--muted) !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    padding: 7px 15px !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+}
+
+.quick-strip button:hover {
+    border-color: var(--border-strong) !important;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(45, 212, 191, 0.08)) !important;
+    color: #b9f4dd !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(16, 185, 129, 0.18) !important;
+}
+
+.quick-strip button:active {
+    transform: translateY(0);
 }
 
 /* ─── Input Row ─── */
 .input-row {
     animation: fadeIn 0.5s ease-out 0.3s both;
-    margin-top: 0.25rem !important;
-}
-
-.input-row {
+    margin-top: 0.5rem !important;
     gap: 8px !important;
     align-items: stretch !important;
 }
@@ -499,37 +568,37 @@ footer { display: none !important; }
     border-radius: 999px !important;
     padding: 0.85rem 1.35rem !important;
     font-size: 0.92rem !important;
-    background: rgba(13, 15, 28, 0.85) !important;
+    background: var(--panel-heavy) !important;
     backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(129, 140, 248, 0.18) !important;
-    color: #e8ecf4 !important;
+    border: 1px solid rgba(52, 211, 153, 0.18) !important;
+    color: var(--text-bright) !important;
     resize: none !important;
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35) !important;
 }
 
 .input-row textarea:focus {
-    border-color: rgba(139, 92, 246, 0.55) !important;
-    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12), 0 8px 28px rgba(0, 0, 0, 0.35) !important;
+    border-color: rgba(52, 211, 153, 0.55) !important;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12), 0 8px 28px rgba(0, 0, 0, 0.35) !important;
     outline: none !important;
 }
 
 .send-btn {
     border-radius: 999px !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     font-size: 0.88rem !important;
     min-height: 48px !important;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
     border: none !important;
-    color: #fff !important;
+    color: #04110c !important;
     cursor: pointer !important;
     letter-spacing: 0.02em !important;
-    box-shadow: 0 6px 22px rgba(99, 102, 241, 0.38) !important;
+    box-shadow: 0 6px 22px rgba(16, 185, 129, 0.35) !important;
 }
 
 .send-btn:hover {
-    background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%) !important;
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 10px 28px rgba(129, 140, 248, 0.5) !important;
+    box-shadow: 0 10px 28px rgba(52, 211, 153, 0.45) !important;
 }
 
 .send-btn:active {
@@ -538,16 +607,16 @@ footer { display: none !important; }
 
 /* ─── Voice Accordion ─── */
 .voice-accordion {
-    background: rgba(11, 13, 26, 0.55) !important;
+    background: var(--panel) !important;
     backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(129, 140, 248, 0.12) !important;
+    border: 1px solid var(--border) !important;
     border-radius: 14px !important;
-    margin-top: 0.6rem !important;
+    margin-top: 0.5rem !important;
     overflow: hidden !important;
 }
 
 .voice-accordion .label-wrap {
-    color: #818cf8 !important;
+    color: #34d399 !important;
     font-size: 0.82rem !important;
     font-weight: 500 !important;
 }
@@ -556,14 +625,14 @@ footer { display: none !important; }
 .tools-row {
     justify-content: center !important;
     gap: 10px !important;
-    margin-top: 0.6rem !important;
+    margin-top: 0.5rem !important;
 }
 
 .tools-row button {
-    background: rgba(13, 15, 28, 0.5) !important;
+    background: rgba(10, 18, 15, 0.5) !important;
     backdrop-filter: blur(8px) !important;
-    border: 1px solid rgba(129, 140, 248, 0.16) !important;
-    color: #7b86b8 !important;
+    border: 1px solid var(--border) !important;
+    color: var(--muted) !important;
     border-radius: 999px !important;
     padding: 6px 16px !important;
     font-size: 0.78rem !important;
@@ -577,150 +646,81 @@ footer { display: none !important; }
     overflow: visible !important;
 }
 
-/* Hide any stray component labels inside the chat panel */
-.chat-wrap .label-wrap, .chat-wrap > label, .chat-wrap span[data-testid="block-info"] {
-    display: none !important;
-}
-
 .tools-row button:hover {
-    background: rgba(99, 102, 241, 0.12) !important;
-    border-color: rgba(129, 140, 248, 0.4) !important;
-    color: #c7d2fe !important;
+    background: rgba(16, 185, 129, 0.12) !important;
+    border-color: var(--border-strong) !important;
+    color: #b9f4dd !important;
     transform: translateY(-1px);
 }
 
-/* ─── Quick Questions ─── */
-.quick-section {
-    animation: fadeIn 0.5s ease-out 0.4s both;
-    padding: 1rem 0 0.5rem;
-}
-
-.quick-label {
-    color: #3d4364;
-    font-size: 0.67rem;
-    text-transform: uppercase;
-    letter-spacing: 0.16em;
-    font-weight: 600;
-    text-align: center;
-    margin-bottom: 0.7rem;
-}
-
-/* Force a 2-column grid on the Gradio Row (which is flex by default) */
-.quick-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-}
-
-.quick-card {
-    width: 100% !important;
-    height: auto !important;
-    min-height: 50px !important;
-    padding: 12px 16px !important;
-    border-radius: 14px !important;
-    border: 1px solid rgba(129, 140, 248, 0.12) !important;
-    background: rgba(11, 13, 26, 0.55) !important;
-    backdrop-filter: blur(10px) !important;
-    color: #8a93b5 !important;
-    font-size: 0.8rem !important;
-    line-height: 1.45 !important;
-    cursor: pointer !important;
-    text-align: left !important;
-    font-weight: 450 !important;
-    justify-content: flex-start !important;
-    /* Gradio buttons default to nowrap — long questions were spilling out */
-    white-space: normal !important;
-    overflow-wrap: anywhere !important;
-    word-break: break-word !important;
-    overflow: hidden !important;
-    position: relative !important;
-}
-
-.quick-card:hover {
-    border-color: rgba(139, 92, 246, 0.45) !important;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.10), rgba(139, 92, 246, 0.07)) !important;
-    color: #d4dcfb !important;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(99, 102, 241, 0.18) !important;
-}
-
-.quick-card:active {
-    transform: translateY(0);
-}
-
-.quick-card .card-icon {
-    font-size: 0.9rem;
-    margin-right: 4px;
-}
-
-/* ─── Footer ─── */
+/* ─── Footer (compact single block) ─── */
 .footer-section {
     animation: fadeIn 0.5s ease-out 0.5s both;
     text-align: center;
-    padding: 1.25rem 0 0.5rem;
-    border-top: 1px solid rgba(99, 102, 241, 0.06);
-    margin-top: 0.75rem;
+    padding: 0.8rem 0 0.3rem;
+    border-top: 1px solid rgba(16, 185, 129, 0.06);
+    margin-top: 0.6rem;
 }
 
 .footer-links {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 0.9rem;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
 }
 
 .footer-link {
-    color: #5b6478;
+    color: var(--muted);
     text-decoration: none;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 500;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 14px;
+    padding: 5px 13px;
     border-radius: 999px;
-    border: 1px solid rgba(129, 140, 248, 0.12);
-    background: rgba(11, 13, 26, 0.5);
+    border: 1px solid var(--border);
+    background: rgba(10, 18, 15, 0.5);
     backdrop-filter: blur(8px);
 }
 
 .footer-link:hover {
-    color: #c7d2fe;
-    border-color: rgba(139, 92, 246, 0.4);
-    background: rgba(99, 102, 241, 0.1);
+    color: #b9f4dd;
+    border-color: var(--border-strong);
+    background: rgba(16, 185, 129, 0.1);
     transform: translateY(-1px);
 }
 
 .footer-credit {
-    color: #2a3050;
-    font-size: 0.66rem;
+    color: #24352d;
+    font-size: 0.64rem;
     letter-spacing: 0.06em;
 }
 
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(129, 140, 248, 0.22); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.45); }
+::-webkit-scrollbar-thumb { background: rgba(52, 211, 153, 0.22); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(52, 211, 153, 0.45); }
 
-/* ─── Responsive ─── */
+/* ─── Responsive ───
+   The chat panel height is calc(100dvh - var(--chat-offset)); each breakpoint
+   only needs to re-declare --chat-offset to match its chrome height. */
 @media (max-width: 768px) {
-    .gradio-container { padding: 0 0.9rem 1.5rem !important; }
-    .hero { padding: 1.8rem 0 1.1rem; }
-    .hero h1 { font-size: 1.6rem; }
-    .hero-avatar-ring { width: 74px; height: 74px; }
+    .gradio-container { padding: 0 0.9rem 0.6rem !important; }
+    .hero { padding: 1.1rem 0 0.7rem; }
+    .hero h1 { font-size: 1.45rem; }
+    .hero-avatar-ring { width: 56px; height: 56px; }
     .chat-wrap { border-radius: 16px !important; }
-    .quick-grid { gap: 8px !important; }
 }
 
 @media (max-width: 640px) {
-    .hero h1 { font-size: 1.45rem; }
-    .hero p { font-size: 0.84rem; }
-    .quick-grid { grid-template-columns: 1fr !important; }
-    .quick-card { min-height: 44px !important; padding: 10px 14px !important; }
-    .footer-links { gap: 0.5rem; }
-    .footer-link { padding: 5px 12px; font-size: 0.74rem; }
+    :root { --chat-offset: 440px; }
+    .hero h1 { font-size: 1.35rem; }
+    .hero p { font-size: 0.8rem; }
+    .footer-links { gap: 0.45rem; }
+    .footer-link { padding: 4px 11px; font-size: 0.72rem; }
     .chat-wrap .message.user,
     .chat-wrap .user-row .message,
     .chat-wrap .message.bot,
@@ -728,12 +728,24 @@ footer { display: none !important; }
     .input-row textarea { padding: 0.75rem 1.1rem !important; font-size: 16px !important; } /* 16px prevents iOS zoom-on-focus */
     .send-btn { min-height: 44px !important; min-width: 70px !important; }
     .tools-row button { padding: 5px 12px !important; font-size: 0.72rem !important; }
+    .quick-strip button { padding: 6px 13px !important; font-size: 0.74rem !important; }
 }
 
 @media (max-width: 400px) {
-    .hero h1 { font-size: 1.3rem; }
-    .hero-avatar-ring { width: 64px; height: 64px; }
-    .status-badge { font-size: 0.66rem; }
+    .hero h1 { font-size: 1.25rem; }
+    .hero-avatar-ring { width: 50px; height: 50px; }
+    .status-badge { font-size: 0.64rem; }
+}
+
+/* Short viewports (landscape phones, small laptops): shrink the chrome so the
+   chat still gets usable height without forcing a page scroll */
+@media (max-height: 760px) {
+    :root { --chat-offset: 360px; }
+    .hero { padding: 0.8rem 0 0.5rem; }
+    .hero p, .status-badge { display: none; }
+    .hero-avatar-ring { width: 44px; height: 44px; margin-bottom: 0.5rem; }
+    .hero h1 { font-size: 1.25rem; }
+    .footer-section { display: none; }
 }
 
 /* Respect users who prefer less motion */
@@ -758,17 +770,18 @@ QUICK_QUESTIONS = [
     {"icon": "📬", "text": "Are you open to new opportunities?"},
 ]
 
+AVATAR_URL = "https://api.dicebear.com/9.x/initials/svg?seed=AM&backgroundColor=047857&textColor=ffffff"
+
 
 # --- Build the UI ---
 
-with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
+with gr.Blocks(title="Chat with Aaditya Mittal", theme=theme, css=CSS) as demo:
 
     # Hero
-    gr.HTML("""
+    gr.HTML(f"""
         <div class="hero">
             <div class="hero-avatar-ring">
-                <img src="https://api.dicebear.com/9.x/initials/svg?seed=AM&backgroundColor=4338ca&textColor=ffffff"
-                     alt="AM" />
+                <img src="{AVATAR_URL}" alt="AM" />
             </div>
             <h1>Chat with Aaditya</h1>
             <p>AI portfolio assistant — ask about my work, skills, or experience</p>
@@ -779,19 +792,24 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
         </div>
     """)
 
-    # Chatbot
+    # Chatbot — height is viewport-driven so the whole shell fits one screen;
+    # --chat-offset is tuned per breakpoint in the CSS
     chatbot = gr.Chatbot(
-        height=440,
+        height="calc(100dvh - var(--chat-offset, 460px))",
         show_label=False,
-        avatar_images=(
-            None,
-            "https://api.dicebear.com/9.x/initials/svg?seed=AM&backgroundColor=4338ca&textColor=ffffff",
-        ),
+        avatar_images=(None, AVATAR_URL),
         elem_classes=["chat-wrap"],
         layout="bubble",
         placeholder="Say hi or pick a question below to get started →",
         buttons=["copy"],
     )
+
+    # Quick questions — horizontally scrollable chip strip between chat and input
+    with gr.Row(elem_classes=["quick-strip"]):
+        quick_buttons = [
+            gr.Button(f"{q['icon']} {q['text']}", size="sm", min_width=40)
+            for q in QUICK_QUESTIONS
+        ]
 
     # Input
     with gr.Row(elem_classes=["input-row"]):
@@ -818,8 +836,8 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
             type="filepath",
             show_label=False,
             waveform_options=gr.WaveformOptions(
-                waveform_color="#6366f1",
-                waveform_progress_color="#818cf8",
+                waveform_color="#10b981",
+                waveform_progress_color="#34d399",
             )
         )
 
@@ -827,23 +845,6 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
         clear_btn = gr.Button("🗑️ Clear Chat", size="sm", min_width=60)
         undo_btn = gr.Button("↩️ Undo Last", size="sm", min_width=60)
         download_btn = gr.DownloadButton("💾 Export Chat", size="sm", min_width=60)
-
-    # Quick questions grid
-    gr.HTML("""
-        <div class="quick-section">
-            <div class="quick-label">Suggested Questions</div>
-        </div>
-    """)
-    with gr.Row(elem_classes=["quick-grid"]):
-        for q in QUICK_QUESTIONS:
-            btn = gr.Button(f"{q['icon']} {q['text']}", elem_classes=["quick-card"])
-            # Clicking a suggestion sends it immediately instead of just filling the box
-            btn.click(
-                lambda history, text=q['text']: user_message(text, None, history),
-                inputs=[chatbot],
-                outputs=[msg, audio, chatbot],
-                queue=False,
-            ).then(bot_response, chatbot, chatbot)
 
     # Footer
     gr.HTML("""
@@ -863,6 +864,15 @@ with gr.Blocks(title="Chat with Aaditya Mittal") as demo:
         </div>
     """)
 
+    # Quick-question wiring — clicking a chip sends it immediately
+    for q, btn in zip(QUICK_QUESTIONS, quick_buttons):
+        btn.click(
+            lambda history, text=q['text']: user_message(text, None, history),
+            inputs=[chatbot],
+            outputs=[msg, audio, chatbot],
+            queue=False,
+        ).then(bot_response, chatbot, chatbot)
+
     # Event wiring (send events use the queue: audio transcription can take seconds)
     msg.submit(user_message, [msg, audio, chatbot], [msg, audio, chatbot]).then(
         bot_response, chatbot, chatbot
@@ -880,6 +890,4 @@ if __name__ == "__main__":
         server_name="0.0.0.0",
         server_port=7860,
         share=False,
-        theme=theme,
-        css=CSS,
     )
