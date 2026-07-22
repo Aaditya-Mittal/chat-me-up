@@ -7,9 +7,8 @@
 Built with [CrewAI](https://crewai.com) · Powered by [Gemini](https://deepmind.google/technologies/gemini/) · Served via [Gradio](https://gradio.app)
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![CrewAI](https://img.shields.io/badge/CrewAI-1.14+-FF6B35?style=flat-square)](https://crewai.com)
 [![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-4285F4?style=flat-square&logo=google&logoColor=white)](https://deepmind.google/technologies/gemini/)
-[![Gradio](https://img.shields.io/badge/Gradio-6.x-F97316?style=flat-square)](https://gradio.app)
+[![Gradio](https://img.shields.io/badge/Gradio-3.x%20%7C%204.x-F97316?style=flat-square)](https://gradio.app)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 </div>
@@ -30,11 +29,12 @@ It's not a generic chatbot. It's trained on my actual background, experiences, p
 
 - **🎤 Voice Input** — Speak your questions directly to the bot using native Gemini audio transcription
 - **🎭 Authentic Persona** — Speaks in first person with my real communication style, humor, and personality quirks
-- **📚 RAG-Powered Knowledge** — Retrieves answers from a curated knowledge base (about me, resume, deep-dive projects, and FAQs)
+- **📚 Real-Time Knowledge** — Compiles a curated knowledge base (about me, resume, deep-dive projects, and FAQs) into an optimized system context at startup
+- **⚡ Native Streaming** — Zero-latency token streaming directly from the Gemini API for ultra-fast, human-like typing
 - **🧠 Conversation Context & Time** — Maintains chat history and knows the current real-world date and time
 - **🛡️ Enterprise-Grade Security** — Built-in protection against prompt injection, jailbreaks, and token-exhaustion
 - **💾 Export Chat** — Recruiters can download a `.txt` transcript of their entire conversation with 1-click
-- **💅 Premium UI** — Dark-themed Gradio interface with live "Thinking" indicators, native quick-question buttons, Clear/Undo controls, and smooth animations
+- **💅 Premium UI** — Glassmorphism dark-themed Gradio interface with native quick-question buttons, Clear/Undo controls, and smooth micro-animations
 
 ---
 
@@ -55,24 +55,23 @@ It's not a generic chatbot. It's trained on my actual background, experiences, p
 └───────────────────────┼──────────────────────────┘
                         │
               ┌─────────▼─────────┐
-              │   CrewAI Crew     │
-              │   (crew.py)       │
+              │ Gemini 2.5 Flash  │
+              │  (Direct Client)  │
               │                   │
               │  ┌─────────────┐  │
-              │  │ Persona     │  │
-              │  │ Agent       │  │
-              │  │ (Gemini)    │  │
+              │  │  Streaming  │  │
+              │  │  Response   │  │
               │  └──────┬──────┘  │
               │         │         │
               │  ┌──────▼──────┐  │
-              │  │ Knowledge   │  │
-              │  │ RAG Search  │  │
-              │  │ (Embeddings)│  │
+              │  │ In-Memory   │  │
+              │  │ System ctx  │  │
+              │  │ (Compiled)  │  │
               │  └──────┬──────┘  │
               │         │         │
               │  ┌──────▼──────┐  │
               │  │ about_me.md │  │
-              │  │ resume.md   │  │
+              │  │ agents.yaml │  │
               │  └─────────────┘  │
               └───────────────────┘
 ```
@@ -153,10 +152,10 @@ crewai run
 | Layer | Technology | Purpose |
 |---|---|---|
 | **LLM** | Gemini 1.5/2.5 Flash | Generates conversational responses and natively transcribes audio |
-| **Orchestration** | CrewAI | Agent/task framework with persona configuration |
-| **Knowledge** | RAG + Google Embeddings | Retrieves relevant facts from markdown/YAML knowledge base |
-| **Frontend** | Gradio 6.x | Interactive chat interface with dark theme and voice capabilities |
-| **History** | In-context injection | Full conversation and dynamic date/time passed to kickoff |
+| **Streaming** | Google GenAI SDK | Bypasses orchestration latency for zero-delay token streaming directly to UI |
+| **Knowledge** | In-Memory Compilation | Parses `.md`/`.yaml` files at startup into an optimized dynamic system prompt |
+| **Frontend** | Gradio 3.x/4.x | Interactive chat interface with premium glassmorphism theme and audio capture |
+| **History** | In-context injection | Full conversation and dynamic date/time passed directly in chat history |
 | **Security** | XML Wrapping & Limits | Prevents prompt injections, jailbreaks, and token exhaustion |
 
 ### Agent Configuration
@@ -182,13 +181,12 @@ The task in `tasks.yaml` follows a 3-step pipeline:
 
 | Category | Technologies |
 |---|---|
-| **Language** | Python 3.12 |
-| **AI Framework** | CrewAI 1.14+ |
+| **Language** | Python 3.10+ |
+| **LLM SDK** | `google-genai` (Native Client) |
 | **LLM** | Google Gemini 2.5 Flash |
-| **Embeddings** | Google `gemini-embedding-001` |
-| **Frontend** | Gradio 6.x |
+| **Frontend** | Gradio 3.x/4.x |
 | **Package Manager** | uv |
-| **Build System** | Hatchling |
+| **Legacy/CLI** | CrewAI 1.14+ (Available via `crew.py` fallback) |
 
 ---
 
